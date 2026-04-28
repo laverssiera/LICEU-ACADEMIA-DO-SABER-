@@ -8,7 +8,8 @@
     "start": "node src/server.js",
     "dev": "node --watch src/server.js",
     "test": "node --test",
-    "roadmap:update": "bash scripts/update-roadmap-status.sh"
+    "roadmap:update": "bash scripts/update-roadmap-status.sh",
+    "smoke:fullstack": "bash scripts/smoke-fullstack.sh"
   },
   "keywords": [
     "educacao",
