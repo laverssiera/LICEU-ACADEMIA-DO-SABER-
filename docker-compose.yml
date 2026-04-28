@@ -1,0 +1,173 @@
+version: '3.8'
+
+# ──────────────────────────────────────────────────────────
+# ACADEMIA DO SABER — FULL STACK DOCKER COMPOSE
+# LICEU Ecossistema
+# ──────────────────────────────────────────────────────────
+
+services:
+
+  # ── FastAPI — Academia Backend ─────────────────────────
+  academy-api:
+    build:
+      context: ./api
+      dockerfile: Dockerfile
+    container_name: academy-api
+    ports:
+      - "8010:8000"
+    environment:
+      DATABASE_URL: postgresql://academy:secret@postgres:5432/academy
+      NATS_URL: nats://nats:4222
+      ENV: production
+    depends_on:
+      postgres:
+        condition: service_healthy
+      nats:
+        condition: service_started
+    restart: unless-stopped
+    networks:
+      - liceu-net
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8000/"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # ── Node.js — API original (mantida) ──────────────────
+  academy-node:
+    build:
+      context: .
+      dockerfile: Dockerfile.node
+    container_name: academy-node
+    ports:
+      - "3000:3000"
+    restart: unless-stopped
+    networks:
+      - liceu-net
+
+  # ── React Frontend — Trading Desk ─────────────────────
+  academy-desk:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    container_name: academy-desk
+    ports:
+      - "8080:80"
+    depends_on:
+      - academy-api
+    restart: unless-stopped
+    networks:
+      - liceu-net
+
+  # ── PostgreSQL 15 ──────────────────────────────────────
+  postgres:
+    image: postgres:15-alpine
+    container_name: academy-postgres
+    ports:
+      - "5432:5432"
+    environment:
+      POSTGRES_DB: academy
+      POSTGRES_USER: academy
+      POSTGRES_PASSWORD: secret
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./schema.sql:/docker-entrypoint-initdb.d/schema.sql:ro
+    restart: unless-stopped
+    networks:
+      - liceu-net
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U academy -d academy"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  # ── NATS JetStream ─────────────────────────────────────
+  nats:
+    image: nats:2.10-alpine
+    container_name: academy-nats
+    ports:
+      - "4222:4222"   # client
+      - "8222:8222"   # monitoring HTTP
+    command: ["-js", "-m", "8222", "--config", "/etc/nats/nats.conf"]
+    volumes:
+      - ./nats/nats.conf:/etc/nats/nats.conf:ro
+      - nats_data:/data/jetstream
+    restart: unless-stopped
+    networks:
+      - liceu-net
+
+  # ── NATS CLI — inicializa streams ────────────────────────
+  nats-init:
+    image: natsio/nats-box:latest
+    container_name: academy-nats-init
+    depends_on:
+      - nats
+    entrypoint: /bin/sh
+    command:
+      - -c
+      - |
+        sleep 3
+        nats -s nats://nats:4222 stream add ACADEMY \
+          --subjects "academy.*" \
+          --storage file \
+          --retention limits \
+          --max-msgs=-1 \
+          --max-age=72h \
+          --replicas=1 2>/dev/null || true
+        nats -s nats://nats:4222 stream add JOHN \
+          --subjects "john.*" \
+          --storage file \
+          --retention limits \
+          --max-msgs=-1 2>/dev/null || true
+        nats -s nats://nats:4222 stream add CORE_DNA \
+          --subjects "core_dna.*" \
+          --storage file \
+          --retention limits \
+          --max-msgs=-1 2>/dev/null || true
+        nats -s nats://nats:4222 stream add HUB \
+          --subjects "hub.*" \
+          --storage file \
+          --retention limits \
+          --max-msgs=-1 2>/dev/null || true
+        nats -s nats://nats:4222 stream add JURIDICO \
+          --subjects "juridico.*" \
+          --storage file \
+          --retention limits \
+          --max-msgs=-1 2>/dev/null || true
+        echo "✓ NATS JetStream streams criados."
+    networks:
+      - liceu-net
+
+  # ── Redis (cache de sessão e score) ──────────────────────
+  redis:
+    image: redis:7-alpine
+    container_name: academy-redis
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+    restart: unless-stopped
+    networks:
+      - liceu-net
+
+  # ── Adminer (DB UI) ────────────────────────────────────
+  adminer:
+    image: adminer:latest
+    container_name: academy-adminer
+    ports:
+      - "8090:8080"
+    depends_on:
+      - postgres
+    restart: unless-stopped
+    networks:
+      - liceu-net
+
+# ──────────────────────────────────────────────────────────
+volumes:
+  postgres_data:
+  nats_data:
+  redis_data:
+
+networks:
+  liceu-net:
+    driver: bridge
