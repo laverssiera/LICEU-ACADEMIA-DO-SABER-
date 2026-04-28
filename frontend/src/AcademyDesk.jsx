@@ -457,10 +457,14 @@ export default function AcademyDesk() {
 
   // ── Tabs para o painel central ──
   const TABS = [
-    ["overview", "◼ Overview"],
-    ["courses",  "📖 Cursos"],
-    ["tracks",   "🗺 Trilhas"],
-    ["cognitive","🧠 Cognitivo"],
+    ["overview",  "◼ Overview"],
+    ["courses",   "📖 Cursos"],
+    ["tracks",    "🗺 Trilhas"],
+    ["cognitive", "🧠 Cognitivo"],
+    ["equipe",    "🔥 Equipe"],
+    ["replay",    "🎬 Replay"],
+    ["sandbox",   "⚡ Sandbox"],
+    ["kanban",    "🔗 Kanban"],
     ["compliance","⚖ Compliance"],
   ]
 
@@ -557,10 +561,14 @@ export default function AcademyDesk() {
               </div>
             </div>
           )}
-          {tab === "courses"   && <CourseList courses={courses} progress={progress} />}
-          {tab === "tracks"    && <TrackList tracks={tracks} />}
-          {tab === "cognitive" && <CognitiveHeatmap profile={cogProfile} />}
-          {tab === "compliance"&& <ComplianceList courses={compliance} />}
+          {tab === "courses"    && <CourseList courses={courses} progress={progress} />}
+          {tab === "tracks"     && <TrackList tracks={tracks} />}
+          {tab === "cognitive"  && <CognitiveHeatmap profile={cogProfile} />}
+          {tab === "equipe"     && <TeamHeatmap />}
+          {tab === "replay"     && <ReplayViewer />}
+          {tab === "sandbox"    && <SandboxGame />}
+          {tab === "kanban"     && <KanbanLearning />}
+          {tab === "compliance" && <ComplianceList courses={compliance} />}
         </PanelBox>
 
         {/* COL C: John + Train Widget */}
@@ -632,430 +640,400 @@ export default function AcademyDesk() {
 }
 
 
-const API_BASE = '/academy'
-const HOLDING_HEADER = { 'x-holding-user-id': 'HLD-002', 'Content-Type': 'application/json' }
+// ╔══════════════════════════════════════════════════════════════════╗
+// ║  EXTENSÕES — PRÓXIMO NÍVEL                                       ║
+// ╚══════════════════════════════════════════════════════════════════╝
 
-// ─── Helpers ────────────────────────────────────────────────────────────────
-function apiFetch(path, opts = {}) {
-  return fetch(`${API_BASE}${path}`, { headers: HOLDING_HEADER, ...opts }).then((r) => r.json())
-}
+// ─── 1. Team Cognitive Heatmap ────────────────────────────────────────────────
+function TeamHeatmap() {
+  const TEAM = ["USR-001", "USR-002", "USR-003", "USR-004", "USR-005"]
+  const [profiles, setProfiles] = useState({})
+  const [loading, setLoading]   = useState(false)
 
-// ─── Sub-components ─────────────────────────────────────────────────────────
-
-function StatCard({ label, value, accent = 'green' }) {
-  const colors = { green: 'border-green-500 text-green-400', blue: 'border-blue-500 text-blue-400', yellow: 'border-yellow-500 text-yellow-400', red: 'border-red-500 text-red-400' }
-  return (
-    <div className={`bg-gray-900 border-l-4 ${colors[accent]} p-4 rounded`}>
-      <p className="text-xs text-gray-400 uppercase tracking-widest mb-1">{label}</p>
-      <p className="text-3xl font-bold">{value ?? '—'}</p>
-    </div>
-  )
-}
-
-function ProgressBar({ pct = 0, color = 'bg-green-500' }) {
-  return (
-    <div className="h-2 w-full bg-gray-700 rounded overflow-hidden mt-2">
-      <div className={`${color} h-2 transition-all duration-500`} style={{ width: `${Math.min(pct, 100)}%` }} />
-    </div>
-  )
-}
-
-function Badge({ text, color = 'gray' }) {
-  const map = { gray: 'bg-gray-700 text-gray-300', green: 'bg-green-900 text-green-300', red: 'bg-red-900 text-red-300', blue: 'bg-blue-900 text-blue-300', yellow: 'bg-yellow-900 text-yellow-300' }
-  return <span className={`text-xs px-2 py-0.5 rounded-full font-medium ${map[color]}`}>{text}</span>
-}
-
-function SectionTitle({ children }) {
-  return <h2 className="text-lg font-semibold text-gray-100 mb-3 border-b border-gray-700 pb-1">{children}</h2>
-}
-
-// ─── Panel: Courses ──────────────────────────────────────────────────────────
-function PanelCourses({ courses, progress }) {
-  if (!courses.length) return <p className="text-gray-500 text-sm">Nenhum curso cadastrado.</p>
-  return (
-    <ul className="space-y-3">
-      {courses.map((c) => (
-        <li key={c.id} className="bg-gray-800 p-3 rounded hover:bg-gray-750 transition">
-          <div className="flex items-center justify-between">
-            <span className="font-medium text-sm">{c.title}</span>
-            <div className="flex gap-2 items-center">
-              <Badge text={c.level || 'basico'} color="blue" />
-              {c.monolith && <Badge text={c.monolith} color="gray" />}
-            </div>
-          </div>
-          <ProgressBar pct={progress[c.id] || 0} />
-          <p className="text-xs text-gray-500 mt-1">{progress[c.id] || 0}% concluído</p>
-        </li>
-      ))}
-    </ul>
-  )
-}
-
-// ─── Panel: Tracks ───────────────────────────────────────────────────────────
-function PanelTracks({ tracks }) {
-  return (
-    <ul className="space-y-2">
-      {tracks.map((t) => (
-        <li key={t.id} className="bg-gray-800 p-3 rounded">
-          <div className="flex items-center justify-between">
-            <span className="text-sm font-semibold">{t.name}</span>
-            <div className="flex gap-1">
-              {t.is_core_liceu && <Badge text="CORE" color="yellow" />}
-              {t.is_mandatory && <Badge text="obrigatório" color="red" />}
-            </div>
-          </div>
-          <p className="text-xs text-gray-400 mt-1">{t.monolith ? `Monólito: ${t.monolith}` : 'Trilha transversal'}</p>
-          {t.modules && <p className="text-xs text-gray-500 mt-0.5">{t.modules.length} módulos</p>}
-        </li>
-      ))}
-    </ul>
-  )
-}
-
-// ─── Panel: John Recomenda ───────────────────────────────────────────────────
-function PanelJohn({ recommendations }) {
-  return (
-    <ul className="space-y-2">
-      {recommendations.map((r) => (
-        <li key={r.id} className="flex items-start gap-2">
-          <span className="mt-0.5 text-green-400">▶</span>
-          <span className="text-sm text-gray-200">{r.title}</span>
-        </li>
-      ))}
-    </ul>
-  )
-}
-
-// ─── Panel: Ranking ──────────────────────────────────────────────────────────
-function PanelRanking({ ranking }) {
-  const medalColors = ['text-yellow-400', 'text-gray-300', 'text-amber-600']
-  if (!ranking.length) return <p className="text-gray-500 text-sm">Nenhum dado de ranking ainda.</p>
-  return (
-    <ol className="space-y-2">
-      {ranking.map((r) => (
-        <li key={r.user_id} className="flex items-center justify-between bg-gray-800 px-3 py-2 rounded">
-          <div className="flex items-center gap-2">
-            <span className={`font-bold text-lg w-6 ${medalColors[r.position - 1] || 'text-gray-400'}`}>{r.position}</span>
-            <div>
-              <p className="text-sm font-medium">{r.user_id}</p>
-              <p className="text-xs text-gray-400">{r.level}</p>
-            </div>
-          </div>
-          <div className="text-right">
-            <p className="text-green-400 font-bold text-sm">{r.xp} XP</p>
-            <p className="text-xs text-gray-400">{r.certifications} cert.</p>
-          </div>
-        </li>
-      ))}
-    </ol>
-  )
-}
-
-// ─── Panel: Eventos ──────────────────────────────────────────────────────────
-function PanelEvents({ events }) {
-  if (!events.length) return <p className="text-gray-500 text-sm">Nenhum evento registrado.</p>
-  return (
-    <ul className="space-y-2 max-h-48 overflow-y-auto">
-      {[...events].reverse().map((e, i) => (
-        <li key={i} className="flex items-start gap-2 text-xs text-gray-300">
-          <span className="text-blue-400 shrink-0">{e.type || e.event_type}</span>
-          <span className="text-gray-500">{e.emitted_at || e.created_at}</span>
-        </li>
-      ))}
-    </ul>
-  )
-}
-
-// ─── Panel: Compliance ───────────────────────────────────────────────────────
-function PanelCompliance({ courses: complianceCourses }) {
-  return (
-    <ul className="space-y-2">
-      {complianceCourses.map((c) => (
-        <li key={c.id} className="flex items-center gap-2 text-sm">
-          <span className="text-red-400">⚖</span>
-          <span>{c.title}</span>
-          <Badge text={c.duration} color="gray" />
-        </li>
-      ))}
-    </ul>
-  )
-}
-
-// ─── Panel: KPI Cards ────────────────────────────────────────────────────────
-function PanelKPIs({ kpis }) {
-  if (!kpis) return null
-  return (
-    <div className="grid grid-cols-2 gap-3">
-      <StatCard label="Matrículas" value={kpis.total_enrollments ?? kpis.totalEnrollments} accent="blue" />
-      <StatCard label="Certificações" value={kpis.completed_certifications ?? kpis.completedCertifications} accent="green" />
-      <StatCard label="Cursos" value={kpis.total_courses ?? kpis.totalCourses} accent="yellow" />
-      <StatCard label="Sandboxes" value={kpis.total_sandbox ?? kpis.totalSandboxSimulations} accent="red" />
-    </div>
-  )
-}
-
-// ─── Main AcademyDesk ────────────────────────────────────────────────────────
-export default function AcademyDesk() {
-  const [tab, setTab] = useState('cursos')
-  const [courses, setCourses] = useState([])
-  const [progress, setProgress] = useState({})
-  const [recommendations, setRecommendations] = useState([])
-  const [tracks, setTracks] = useState([])
-  const [ranking, setRanking] = useState([])
-  const [events, setEvents] = useState([])
-  const [kpis, setKpis] = useState(null)
-  const [complianceCourses, setComplianceCourses] = useState([])
-  const [loading, setLoading] = useState(true)
-  const [metrics, setMetrics] = useState(null)
-
-  const loadAll = useCallback(async () => {
+  async function load() {
     setLoading(true)
-    try {
-      const [dash, tracksData, rankingData, eventsData, metricsData, legalData] = await Promise.all([
-        apiFetch('/dashboard'),
-        apiFetch('/tracks'),
-        apiFetch('/ranking/gamified'),
-        apiFetch('/events'),
-        apiFetch('/metrics/dashboard'),
-        apiFetch('/legal/compliance-courses'),
-      ])
+    const results = await Promise.allSettled(
+      TEAM.map((uid) =>
+        apiFetch("/cefeida/analyze", {
+          method: "POST",
+          body: JSON.stringify({ user_id: uid, context: "team_heatmap" }),
+        }).then((r) => ({ uid, matrix: r.skill_profile?.skill_matrix || {} }))
+      )
+    )
+    const map = {}
+    results.forEach((r) => { if (r.status === "fulfilled") map[r.value.uid] = r.value.matrix })
+    setProfiles(map)
+    setLoading(false)
+  }
 
-      setCourses(Array.isArray(dash.courses) ? dash.courses : [])
-      setProgress(dash.progress || {})
-      setRecommendations(Array.isArray(dash.recommendations) ? dash.recommendations : [])
-      setTracks(Array.isArray(tracksData) ? tracksData : [])
-      setRanking(Array.isArray(rankingData) ? rankingData : [])
-      setEvents(Array.isArray(eventsData) ? eventsData : [])
-      setKpis(metricsData?.kpis || null)
-      setMetrics(metricsData)
-      setComplianceCourses(Array.isArray(legalData) ? legalData : [])
-    } catch {
-      // API offline — show empty state
-    } finally {
-      setLoading(false)
-    }
-  }, [])
+  useEffect(() => { load() }, [])
+
+  const allSkills = [...new Set(Object.values(profiles).flatMap(Object.keys))]
+
+  if (loading) return <p className="text-xs text-gray-500">Carregando heatmap de equipe…</p>
+  if (!allSkills.length) return (
+    <div className="text-center text-gray-600 text-xs py-4">
+      <p>Heatmap cognitivo por equipe</p>
+      <p className="mt-1 text-[10px]">Conecte a API CEFEIDA para visualizar</p>
+      <button onClick={load} className="mt-2 text-[10px] bg-purple-900 text-purple-300 px-3 py-1 rounded hover:bg-purple-800 transition">↺ Tentar novamente</button>
+    </div>
+  )
+
+  const USERS = Object.keys(profiles)
+  return (
+    <div className="overflow-x-auto">
+      <table className="w-full text-[10px] border-collapse">
+        <thead>
+          <tr>
+            <th className="text-left text-gray-500 pb-2 pr-3 font-normal uppercase tracking-widest">Usuário</th>
+            {allSkills.map((s) => (
+              <th key={s} className="text-gray-500 pb-2 px-1 font-normal uppercase tracking-widest whitespace-nowrap">
+                {s.replace(/_/g, " ")}
+              </th>
+            ))}
+          </tr>
+        </thead>
+        <tbody>
+          {USERS.map((uid) => (
+            <tr key={uid} className="border-t border-gray-800">
+              <td className="py-1.5 pr-3 text-gray-400 font-medium">{uid}</td>
+              {allSkills.map((skill) => {
+                const pct = Number(profiles[uid]?.[skill]) || 0
+                const bg = pct >= 75 ? "#14532d" : pct >= 50 ? "#713f12" : pct > 0 ? "#450a0a" : "#0d0d14"
+                const fg = pct >= 75 ? "#4ade80" : pct >= 50 ? "#F5C542" : pct > 0 ? "#f87171" : "#374151"
+                return (
+                  <td key={skill} className="px-1 py-1.5 text-center">
+                    <div style={{ background: bg, borderRadius: 4, padding: "3px 6px" }}>
+                      <span style={{ color: fg, fontWeight: 700 }}>{pct || "—"}</span>
+                    </div>
+                  </td>
+                )
+              })}
+            </tr>
+          ))}
+        </tbody>
+      </table>
+      <button onClick={load} className="mt-3 text-[10px] bg-purple-900 text-purple-300 px-3 py-1 rounded hover:bg-purple-800 transition">↺ Atualizar</button>
+    </div>
+  )
+}
+
+// ─── 2. Replay Visual (Netflix-style) ────────────────────────────────────────
+const REPLAY_TYPES = ["negociacao", "objecao", "fechamento", "prospeccao"]
+
+function ReplayViewer() {
+  const [replays, setReplays]     = useState([])
+  const [active, setActive]       = useState(null)
+  const [creating, setCreating]   = useState(false)
+  const [form, setForm]           = useState({ reference_id: "NEG-001", replay_type: "negociacao" })
 
   useEffect(() => {
-    loadAll()
-    const interval = setInterval(loadAll, 30_000)
-    return () => clearInterval(interval)
-  }, [loadAll])
+    apiFetch("/events?type=academy.replay.created")
+      .then((ev) => setReplays(Array.isArray(ev) ? ev.slice(0, 12) : []))
+      .catch(() => setReplays([]))
+  }, [])
 
-  const TABS = ['cursos', 'trilhas', 'ranking', 'compliance', 'eventos', 'métricas']
+  async function createReplay() {
+    setCreating(true)
+    try {
+      const res = await apiFetch("/replay", {
+        method: "POST",
+        body: JSON.stringify({ ...form, notes: "Revisão automática via UI" }),
+      })
+      setReplays((p) => [{ type: "academy.replay.created", payload: res, emitted_at: new Date().toISOString() }, ...p])
+      setActive(res)
+    } finally { setCreating(false) }
+  }
 
   return (
-    <div className="min-h-screen bg-black text-white font-sans">
-      {/* ── Header ── */}
-      <header className="flex items-center justify-between px-6 py-4 border-b border-gray-800 bg-gray-950">
-        <div className="flex items-center gap-3">
-          <span className="text-2xl">📚</span>
-          <div>
-            <h1 className="text-xl font-bold tracking-wide">Academia do Saber</h1>
-            <p className="text-xs text-gray-400">LICEU Ecossistema — Motor Educacional</p>
-          </div>
+    <div className="space-y-3">
+      {/* Criar replay */}
+      <div className="flex gap-2 items-end">
+        <div className="flex-1">
+          <p className="text-[10px] text-gray-500 uppercase tracking-widest mb-1">Referência</p>
+          <input
+            value={form.reference_id}
+            onChange={(e) => setForm((f) => ({ ...f, reference_id: e.target.value }))}
+            className="w-full bg-[#0d0d14] border border-[#1e1e2e] text-white text-xs px-2 py-1.5 rounded focus:outline-none focus:border-cyan-700"
+            placeholder="ID da negociação"
+          />
         </div>
-        <div className="flex items-center gap-4">
-          <span className="text-xs text-gray-500">HLD-002 — academy_director</span>
-          <button onClick={loadAll} className="text-xs bg-gray-800 hover:bg-gray-700 px-3 py-1.5 rounded transition">
-            ↻ Atualizar
-          </button>
-          <span className="w-2 h-2 rounded-full bg-green-500 animate-pulse" title="Online" />
+        <div>
+          <p className="text-[10px] text-gray-500 uppercase tracking-widest mb-1">Tipo</p>
+          <select
+            value={form.replay_type}
+            onChange={(e) => setForm((f) => ({ ...f, replay_type: e.target.value }))}
+            className="bg-[#0d0d14] border border-[#1e1e2e] text-white text-xs px-2 py-1.5 rounded focus:outline-none"
+          >
+            {REPLAY_TYPES.map((t) => <option key={t}>{t}</option>)}
+          </select>
         </div>
-      </header>
+        <button
+          onClick={createReplay}
+          disabled={creating}
+          className="text-xs bg-cyan-900 hover:bg-cyan-800 disabled:opacity-50 text-cyan-300 px-3 py-1.5 rounded transition"
+        >
+          {creating ? "…" : "▶ Criar Replay"}
+        </button>
+      </div>
 
-      <div className="grid grid-cols-12 gap-0 min-h-[calc(100vh-65px)]">
-        {/* ── Sidebar ── */}
-        <nav className="col-span-1 border-r border-gray-800 bg-gray-950 flex flex-col items-center py-6 gap-6">
-          {[
-            ['cursos', '📖'],
-            ['trilhas', '🗺️'],
-            ['ranking', '🏆'],
-            ['compliance', '⚖️'],
-            ['eventos', '📡'],
-            ['métricas', '📊'],
-          ].map(([key, icon]) => (
+      {/* Replay ativo */}
+      {active && (
+        <div style={{ background: "#0d0d14", border: "1px solid #164e63", borderRadius: 8, padding: "10px 14px" }}>
+          <div className="flex items-center justify-between mb-2">
+            <span className="text-xs font-bold text-cyan-300">▶ REPLAY ATIVO</span>
+            <button onClick={() => setActive(null)} className="text-[10px] text-gray-600 hover:text-gray-400">✕</button>
+          </div>
+          <p className="text-[11px] text-white font-semibold">{active.reference_id} — {active.replay_type}</p>
+          {active.insights?.length > 0 && (
+            <ul className="mt-2 space-y-1">
+              {active.insights.map((ins, i) => (
+                <li key={i} className="text-[10px] text-gray-400 flex gap-1.5">
+                  <span className="text-cyan-500 shrink-0">›</span>{ins}
+                </li>
+              ))}
+            </ul>
+          )}
+          <div className="mt-3 h-1.5 rounded-full overflow-hidden" style={{ background: "#1e293b" }}>
+            <div className="h-full bg-cyan-500 animate-pulse" style={{ width: "60%" }} />
+          </div>
+          <p className="text-[10px] text-gray-600 mt-1">Reproduzindo análise…</p>
+        </div>
+      )}
+
+      {/* Grid de replays */}
+      <div className="grid grid-cols-2 gap-2">
+        {replays.map((ev, i) => {
+          const p = ev.payload || {}
+          return (
             <button
-              key={key}
-              onClick={() => setTab(key)}
-              title={key}
-              className={`text-2xl p-2 rounded-lg transition ${tab === key ? 'bg-gray-800 ring-1 ring-green-500' : 'hover:bg-gray-800'}`}
+              key={i}
+              onClick={() => setActive(p)}
+              className="text-left rounded overflow-hidden transition hover:ring-1 hover:ring-cyan-700"
+              style={{ background: "#0d0d14", border: "1px solid #1e1e2e" }}
             >
-              {icon}
+              <div style={{ background: "#0e3a4a", padding: "20px 8px", textAlign: "center", fontSize: 22 }}>🎬</div>
+              <div className="p-2">
+                <p className="text-[10px] font-bold text-white truncate">{p.reference_id || `Replay #${i + 1}`}</p>
+                <p className="text-[10px] text-gray-600">{p.replay_type || "—"}</p>
+                <p className="text-[9px] text-gray-700 mt-0.5">{ev.emitted_at?.slice(0, 10)}</p>
+              </div>
             </button>
-          ))}
-        </nav>
-
-        {/* ── Main Content ── */}
-        <main className="col-span-8 p-6 overflow-y-auto">
-          {loading && <div className="flex items-center justify-center h-40 text-gray-500">Carregando...</div>}
-
-          {!loading && tab === 'cursos' && (
-            <>
-              <SectionTitle>Cursos — Domínio Educacional</SectionTitle>
-              <PanelCourses courses={courses} progress={progress} />
-              {!courses.length && (
-                <div className="mt-6 bg-gray-900 rounded p-4 text-gray-400 text-sm">
-                  <p>Nenhum curso cadastrado ainda.</p>
-                  <p className="mt-1">Use <code className="text-green-400">POST /academy/courses</code> para começar.</p>
-                </div>
-              )}
-            </>
-          )}
-
-          {!loading && tab === 'trilhas' && (
-            <>
-              <SectionTitle>Trilhas por Monólito</SectionTitle>
-              <PanelTracks tracks={tracks} />
-            </>
-          )}
-
-          {!loading && tab === 'ranking' && (
-            <>
-              <SectionTitle>Ranking Gamificado — XP & Nível</SectionTitle>
-              <PanelRanking ranking={ranking.slice(0, 15)} />
-            </>
-          )}
-
-          {!loading && tab === 'compliance' && (
-            <>
-              <SectionTitle>Compliance Jurídico Obrigatório</SectionTitle>
-              <PanelCompliance courses={complianceCourses} />
-            </>
-          )}
-
-          {!loading && tab === 'eventos' && (
-            <>
-              <SectionTitle>Eventos NATS (academy.*)</SectionTitle>
-              <PanelEvents events={events} />
-            </>
-          )}
-
-          {!loading && tab === 'métricas' && (
-            <>
-              <SectionTitle>KPIs Educacionais</SectionTitle>
-              <PanelKPIs kpis={kpis} />
-              {metrics?.track_completion?.length > 0 && (
-                <div className="mt-6">
-                  <SectionTitle>Conclusão por Trilha</SectionTitle>
-                  <ul className="space-y-3">
-                    {metrics.track_completion.map((tc) => {
-                      const pct = tc.enrolled > 0 ? Math.round((tc.completed / tc.enrolled) * 100) : 0
-                      return (
-                        <li key={tc.track} className="bg-gray-900 p-3 rounded">
-                          <div className="flex justify-between text-sm mb-1">
-                            <span>{tc.track}</span>
-                            <span className="text-gray-400">{tc.completed}/{tc.enrolled} — {pct}%</span>
-                          </div>
-                          <ProgressBar pct={pct} color={pct >= 80 ? 'bg-green-500' : pct >= 50 ? 'bg-yellow-500' : 'bg-red-500'} />
-                        </li>
-                      )
-                    })}
-                  </ul>
-                </div>
-              )}
-            </>
-          )}
-        </main>
-
-        {/* ── Right Panel: John + Alertas ── */}
-        <aside className="col-span-3 border-l border-gray-800 bg-gray-950 p-5 flex flex-col gap-6 overflow-y-auto">
-          {/* John AI */}
-          <div>
-            <SectionTitle>🤖 John Recomenda</SectionTitle>
-            <PanelJohn recommendations={recommendations} />
-            <div className="mt-4 bg-gray-800 rounded p-3">
-              <p className="text-xs text-gray-400 mb-2">Treinar com John</p>
-              <JohnTrainWidget />
-            </div>
-          </div>
-
-          {/* Alertas de atraso */}
-          <div>
-            <SectionTitle>⚠️ Alertas</SectionTitle>
-            <LateAlertsWidget />
-          </div>
-
-          {/* Eventos recentes */}
-          <div>
-            <SectionTitle>📡 Eventos Recentes</SectionTitle>
-            <PanelEvents events={events.slice(-6)} />
-          </div>
-        </aside>
+          )
+        })}
+        {!replays.length && (
+          <p className="col-span-2 text-xs text-gray-600 py-4 text-center">Nenhum replay gerado ainda.</p>
+        )}
       </div>
     </div>
   )
 }
 
-// ─── Widget: John Quick Train ────────────────────────────────────────────────
-function JohnTrainWidget() {
-  const [userId, setUserId] = useState('USR-001')
-  const [result, setResult] = useState(null)
-  const [loading, setLoading] = useState(false)
+// ─── 3. Sandbox Game (decisão → consequência) ─────────────────────────────────
+const SCENARIOS = [
+  { id: "S1", label: "Negociação BIM — Desconto agressivo", skill: "negociacao", difficulty: "hard" },
+  { id: "S2", label: "Objeção jurídica — Contrato SaaS",   skill: "juridico",   difficulty: "medium" },
+  { id: "S3", label: "Prospecção fria — Industria 4.0",    skill: "prospeccao", difficulty: "easy" },
+  { id: "S4", label: "Fechamento premium — C-Level",       skill: "fechamento", difficulty: "hard" },
+]
+const DIFF_COLOR = { easy: "#166534", medium: "#713f12", hard: "#7f1d1d" }
+const DIFF_TEXT  = { easy: "#4ade80",  medium: "#F5C542",  hard: "#f87171"  }
 
-  async function handleTrain() {
-    setLoading(true)
+function SandboxGame() {
+  const [scenario, setScenario] = useState(SCENARIOS[0])
+  const [userId, setUserId]     = useState("USR-001")
+  const [result, setResult]     = useState(null)
+  const [running, setRunning]   = useState(false)
+  const [history, setHistory]   = useState([])
+
+  async function simulate() {
+    setRunning(true)
+    setResult(null)
     try {
-      const res = await apiFetch('/john/train', {
-        method: 'POST',
-        body: JSON.stringify({ user_id: userId, current_scores: { bim: 45, juridico: 55 }, completed_courses: [] }),
+      const res = await apiFetch("/sandbox/simulate", {
+        method: "POST",
+        body: JSON.stringify({
+          user_id: userId,
+          scenario_id: scenario.id,
+          skill_focus: scenario.skill,
+          difficulty: scenario.difficulty,
+        }),
       })
       setResult(res)
-    } finally {
-      setLoading(false)
-    }
+      setHistory((h) => [{ scenario: scenario.label, outcome: res.outcome, score: res.score }, ...h.slice(0, 4)])
+    } finally { setRunning(false) }
   }
 
   return (
-    <div className="space-y-2">
-      <input
-        value={userId}
-        onChange={(e) => setUserId(e.target.value)}
-        className="w-full bg-gray-700 text-white text-xs px-2 py-1.5 rounded border border-gray-600 focus:outline-none focus:border-green-500"
-        placeholder="User ID"
-      />
-      <button
-        onClick={handleTrain}
-        disabled={loading}
-        className="w-full text-xs bg-green-700 hover:bg-green-600 disabled:opacity-50 py-1.5 rounded transition font-medium"
-      >
-        {loading ? 'Analisando...' : '▶ Analisar Performance'}
-      </button>
+    <div className="space-y-3">
+      {/* Seletor de cenário */}
+      <div className="grid grid-cols-2 gap-2">
+        {SCENARIOS.map((sc) => (
+          <button
+            key={sc.id}
+            onClick={() => { setScenario(sc); setResult(null) }}
+            className="text-left p-2 rounded transition"
+            style={{
+              background: scenario.id === sc.id ? "#1a1440" : "#0d0d14",
+              border: `1px solid ${scenario.id === sc.id ? "#6d28d9" : "#1e1e2e"}`,
+            }}
+          >
+            <p className="text-[10px] font-semibold text-white leading-tight">{sc.label}</p>
+            <span
+              className="text-[9px] font-bold px-1.5 py-0.5 rounded-full mt-1 inline-block"
+              style={{ background: DIFF_COLOR[sc.difficulty], color: DIFF_TEXT[sc.difficulty] }}
+            >
+              {sc.difficulty}
+            </span>
+          </button>
+        ))}
+      </div>
+
+      {/* Controles */}
+      <div className="flex gap-2 items-center">
+        <input
+          value={userId}
+          onChange={(e) => setUserId(e.target.value)}
+          className="flex-1 bg-[#0d0d14] border border-[#1e1e2e] text-white text-xs px-2 py-1.5 rounded focus:outline-none focus:border-purple-700"
+          placeholder="User ID"
+        />
+        <button
+          onClick={simulate}
+          disabled={running}
+          className="text-xs bg-purple-900 hover:bg-purple-800 disabled:opacity-50 text-purple-200 px-4 py-1.5 rounded transition font-bold"
+        >
+          {running ? "⚡ Simulando…" : "▶ Simular"}
+        </button>
+      </div>
+
+      {/* Resultado */}
       {result && (
-        <div className="text-xs text-gray-300 mt-2 space-y-1">
-          <p className="text-green-400 font-semibold">Plano gerado:</p>
-          <p>Dificuldade: <span className="text-white">{result.recommended_difficulty}</span></p>
-          {result.weak_areas?.length > 0 && (
-            <p>Pontos fracos: <span className="text-red-300">{result.weak_areas.join(', ')}</span></p>
+        <div
+          style={{
+            background: "#0d0d14",
+            border: `1px solid ${result.outcome === "success" ? "#166534" : result.outcome === "partial" ? "#713f12" : "#7f1d1d"}`,
+            borderRadius: 8,
+            padding: "12px 14px",
+          }}
+        >
+          <div className="flex items-center justify-between mb-2">
+            <span className="text-sm font-extrabold" style={{ color: result.outcome === "success" ? "#4ade80" : result.outcome === "partial" ? "#F5C542" : "#f87171" }}>
+              {result.outcome === "success" ? "✓ SUCESSO" : result.outcome === "partial" ? "◑ PARCIAL" : "✗ FALHOU"}
+            </span>
+            <span className="text-xs text-gray-400">Score: <b className="text-white">{result.score ?? "—"}</b></span>
+          </div>
+          {result.feedback && <p className="text-[11px] text-gray-300 leading-relaxed">{result.feedback}</p>}
+          {result.next_recommended_course && (
+            <p className="mt-2 text-[10px] text-purple-400">
+              📚 Recomendado: <span className="text-white">{result.next_recommended_course}</span>
+            </p>
           )}
-          <p>Próximo passo: <span className="text-yellow-300">{result.next_step}</span></p>
+        </div>
+      )}
+
+      {/* Histórico */}
+      {history.length > 0 && (
+        <div>
+          <p className="text-[10px] text-gray-500 uppercase tracking-widest mb-1.5">Histórico de simulações</p>
+          <div className="space-y-1">
+            {history.map((h, i) => (
+              <div key={i} className="flex justify-between text-[10px] py-1 border-b border-gray-800">
+                <span className="text-gray-400 truncate max-w-[60%]">{h.scenario}</span>
+                <span style={{ color: h.outcome === "success" ? "#4ade80" : h.outcome === "partial" ? "#F5C542" : "#f87171" }}>
+                  {h.outcome} {h.score != null ? `· ${h.score}pts` : ""}
+                </span>
+              </div>
+            ))}
+          </div>
         </div>
       )}
     </div>
   )
 }
 
-// ─── Widget: Late Alerts ─────────────────────────────────────────────────────
-function LateAlertsWidget() {
-  const [data, setData] = useState(null)
+// ─── 4. Kanban → Treinamento Automático ──────────────────────────────────────
+function KanbanLearning() {
+  const [taskId, setTaskId]         = useState("TASK-001")
+  const [taskTitle, setTaskTitle]   = useState("Implementar módulo de negociação B2B")
+  const [result, setResult]         = useState(null)
+  const [loading, setLoading]       = useState(false)
+  const [history, setHistory]       = useState([])
 
-  useEffect(() => {
-    apiFetch('/dashboard/institutional')
-      .then((d) => setData(d?.blocks?.late_alerts || []))
-      .catch(() => setData([]))
-  }, [])
-
-  if (!data) return <p className="text-xs text-gray-500">Carregando...</p>
-  if (!data.length) return <p className="text-xs text-green-400">✓ Nenhum atraso crítico.</p>
+  async function generate() {
+    setLoading(true)
+    setResult(null)
+    try {
+      const res = await apiFetch("/kanban/task-learning", {
+        method: "POST",
+        body: JSON.stringify({ task_id: taskId, title: taskTitle, tags: ["negociacao", "b2b"] }),
+      })
+      setResult(res)
+      setHistory((h) => [{ task_id: taskId, title: taskTitle, courses: res.generated_courses?.length ?? 0 }, ...h.slice(0, 4)])
+    } finally { setLoading(false) }
+  }
 
   return (
-    <ul className="space-y-2">
-      {data.map((a, i) => (
-        <li key={i} className="text-xs bg-red-950 border border-red-800 rounded p-2">
-          <p className="font-semibold text-red-300">{a.user_id}</p>
-          <p className="text-gray-400">Cargo: {a.role} — {a.pending} trilha(s) pendente(s)</p>
-        </li>
-      ))}
-    </ul>
+    <div className="space-y-3">
+      <div className="space-y-2">
+        <div>
+          <p className="text-[10px] text-gray-500 uppercase tracking-widest mb-1">Task ID</p>
+          <input
+            value={taskId}
+            onChange={(e) => setTaskId(e.target.value)}
+            className="w-full bg-[#0d0d14] border border-[#1e1e2e] text-white text-xs px-2 py-1.5 rounded focus:outline-none focus:border-yellow-700"
+            placeholder="ID da task no Kanban"
+          />
+        </div>
+        <div>
+          <p className="text-[10px] text-gray-500 uppercase tracking-widest mb-1">Descrição da Task</p>
+          <input
+            value={taskTitle}
+            onChange={(e) => setTaskTitle(e.target.value)}
+            className="w-full bg-[#0d0d14] border border-[#1e1e2e] text-white text-xs px-2 py-1.5 rounded focus:outline-none focus:border-yellow-700"
+            placeholder="O que a task envolve?"
+          />
+        </div>
+        <button
+          onClick={generate}
+          disabled={loading}
+          className="w-full text-xs bg-yellow-900 hover:bg-yellow-800 disabled:opacity-50 text-yellow-200 py-1.5 rounded transition font-bold"
+        >
+          {loading ? "⚡ Gerando treinamentos…" : "🔗 Conectar Task → Treinamento"}
+        </button>
+      </div>
+
+      {/* Resultado */}
+      {result && (
+        <div style={{ background: "#0d0d14", border: "1px solid #713f12", borderRadius: 8, padding: "12px 14px" }}>
+          <p className="text-xs font-bold text-yellow-400 mb-2">
+            ✓ {result.generated_courses?.length ?? 0} treinamento(s) gerado(s)
+          </p>
+          {result.generated_courses?.map((c, i) => (
+            <div key={i} className="flex justify-between text-[10px] py-1 border-b border-gray-800">
+              <span className="text-gray-300 truncate max-w-[70%]">{c.title || c}</span>
+              <Pill color="#451a03">{c.level || "obrigatório"}</Pill>
+            </div>
+          ))}
+          {result.rationale && (
+            <p className="mt-3 text-[10px] text-gray-500 leading-relaxed">{result.rationale}</p>
+          )}
+        </div>
+      )}
+
+      {/* Histórico de tasks */}
+      {history.length > 0 && (
+        <div>
+          <p className="text-[10px] text-gray-500 uppercase tracking-widest mb-1.5">Tasks processadas</p>
+          <div className="space-y-1">
+            {history.map((h, i) => (
+              <div key={i} className="flex justify-between text-[10px] py-1 border-b border-gray-800">
+                <span className="text-gray-400 truncate max-w-[70%]">{h.task_id} — {h.title}</span>
+                <span className="text-yellow-500">{h.courses} cursos</span>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
+    </div>
   )
 }
