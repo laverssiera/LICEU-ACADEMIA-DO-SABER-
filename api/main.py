@@ -5,6 +5,7 @@ LICEU Ecossistema | Issues 1-30
 
 from __future__ import annotations
 
+import asyncio
 import json
 import math
 import random
@@ -13,7 +14,7 @@ from datetime import datetime
 from functools import wraps
 from typing import Any
 
-from fastapi import Depends, FastAPI, HTTPException, Query, Request
+from fastapi import Depends, FastAPI, HTTPException, Query, Request, WebSocket, WebSocketDisconnect
 from fastapi.middleware.cors import CORSMiddleware
 
 # ──────────────────────────────────────────────────────────────────────────────
@@ -65,12 +66,82 @@ async def publish(subject: str, payload: dict) -> None:
         except Exception:
             pass
     # also write to in-memory event log
-    academy_events.append({
+    event = {
         "id": str(uuid.uuid4()),
         "type": subject,
         "payload": payload,
         "emitted_at": datetime.utcnow().isoformat(),
-    })
+    }
+    academy_events.append(event)
+    # broadcast to all WebSocket clients
+    await ws_manager.broadcast(event)
+
+
+# ──────────────────────────────────────────────────────────────────────────────
+# WebSocket — Real-time event feed (/events/ws)
+# ──────────────────────────────────────────────────────────────────────────────
+ACADEMY_EVENT_TYPES = {
+    "academy.enrolled",
+    "academy.lesson.completed",
+    "academy.certified",
+    "academy.failed",
+    "academy.john_recommended",
+    "academy.compliance.accepted",
+    "academy.onboarding.started",
+    "academy.sandbox.executed",
+    "academy.replay.created",
+    "academy.task.learning_generated",
+    "academy.course.completed",
+}
+
+
+class WSConnectionManager:
+    def __init__(self) -> None:
+        self._connections: list[WebSocket] = []
+
+    async def connect(self, ws: WebSocket) -> None:
+        await ws.accept()
+        self._connections.append(ws)
+
+    def disconnect(self, ws: WebSocket) -> None:
+        self._connections = [c for c in self._connections if c is not ws]
+
+    async def broadcast(self, payload: dict) -> None:
+        dead: list[WebSocket] = []
+        msg = json.dumps(payload)
+        for ws in list(self._connections):
+            try:
+                await ws.send_text(msg)
+            except Exception:
+                dead.append(ws)
+        for ws in dead:
+            self.disconnect(ws)
+
+
+ws_manager = WSConnectionManager()
+
+
+@app.websocket("/events/ws")
+async def events_ws(websocket: WebSocket) -> None:
+    """
+    WebSocket de eventos em tempo real da Academia.
+    Ao conectar, envia os últimos 20 eventos já existentes.
+    Após isso, recebe todos os novos eventos publicados via `publish()`.
+    """
+    await ws_manager.connect(websocket)
+    try:
+        # replay dos últimos 20 eventos ao conectar
+        for ev in academy_events[-20:]:
+            await websocket.send_text(json.dumps(ev))
+
+        # mantém a conexão viva — ping a cada 25s
+        while True:
+            await asyncio.sleep(25)
+            await websocket.send_text(json.dumps({"type": "ping", "ts": datetime.utcnow().isoformat()}))
+    except WebSocketDisconnect:
+        ws_manager.disconnect(websocket)
+    except Exception:
+        ws_manager.disconnect(websocket)
 
 
 # ──────────────────────────────────────────────────────────────────────────────

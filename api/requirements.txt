@@ -5,3 +5,4 @@ nats-py==2.6.0
 asyncpg==0.29.0
 python-dotenv==1.0.1
 uuid==1.30
+websockets==12.0
