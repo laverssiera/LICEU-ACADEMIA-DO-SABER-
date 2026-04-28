@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState, useCallback } from "react"
+import { useEffect, useRef, useState, useCallback, useMemo } from "react"
 
 // ─── Config ──────────────────────────────────────────────────────────────────
 const API_BASE = "/academy"
@@ -82,7 +82,7 @@ function Metric({ label, value, accent = "#22d3ee", sub }) {
 }
 
 // ─── Top Bar ─────────────────────────────────────────────────────────────────
-function TopBar({ kpis, wsState, onRefresh }) {
+function TopBar({ kpis, wsState, wsStats, onRefresh }) {
   const dot = wsState === "open" ? "#22c55e" : wsState === "connecting" ? "#eab308" : "#ef4444"
   return (
     <div
@@ -116,6 +116,12 @@ function TopBar({ kpis, wsState, onRefresh }) {
 
       {/* Status */}
       <div className="flex items-center gap-3">
+        <span className="text-[10px] text-gray-500">
+          WS msgs: <strong className="text-gray-300">{wsStats.received}</strong>
+        </span>
+        <span className="text-[10px] text-gray-500">
+          Último: <strong className="text-gray-300">{wsStats.lastType || "—"}</strong>
+        </span>
         <span className="text-[10px] text-gray-500">HLD-002 · academy_director</span>
         <button
           onClick={onRefresh}
@@ -379,7 +385,17 @@ export default function AcademyDesk() {
   const [cogProfile, setCogProfile] = useState(null)
   const [wsState, setWsState]       = useState("connecting")
   const [tab, setTab]               = useState("overview")
+  const [eventTypeFilter, setEventTypeFilter] = useState("all")
+  const [eventSearch, setEventSearch] = useState("")
+  const [feedPaused, setFeedPaused] = useState(false)
+  const [wsStats, setWsStats] = useState({ received: 0, lastType: null })
   const wsRef = useRef(null)
+  const reconnectMsRef = useRef(1000)
+  const feedPausedRef = useRef(false)
+
+  useEffect(() => {
+    feedPausedRef.current = feedPaused
+  }, [feedPaused])
 
   // ── REST polling ──
   const loadAll = useCallback(async () => {
@@ -415,11 +431,15 @@ export default function AcademyDesk() {
       wsRef.current = ws
       setWsState("connecting")
 
-      ws.onopen  = () => setWsState("open")
+      ws.onopen  = () => {
+        setWsState("open")
+        reconnectMsRef.current = 1000
+      }
       ws.onclose = () => {
         setWsState("closed")
-        // reconnect after 4s
-        setTimeout(connect, 4000)
+        const delay = reconnectMsRef.current
+        reconnectMsRef.current = Math.min(reconnectMsRef.current * 2, 20_000)
+        setTimeout(connect, delay)
       }
       ws.onerror = () => ws.close()
 
@@ -428,7 +448,14 @@ export default function AcademyDesk() {
           const ev = JSON.parse(msg.data)
           if (ev.type === "ping") return
 
-          setEvents((prev) => [...prev.slice(-29), ev])
+          setWsStats((prev) => ({
+            received: prev.received + 1,
+            lastType: ev.type || null,
+          }))
+
+          if (!feedPausedRef.current) {
+            setEvents((prev) => [...prev.slice(-29), ev])
+          }
 
           if (ev.type === "academy.john_recommended") {
             const payload = ev.payload || {}
@@ -454,6 +481,21 @@ export default function AcademyDesk() {
   // ── Helpers ──
   const completionRate = kpis?.completion_rate ?? 0
   const completionColor = completionRate >= 70 ? "#4ade80" : completionRate >= 40 ? "#F5C542" : "#f87171"
+  const eventTypes = useMemo(
+    () => Array.from(new Set(events.filter((e) => e.type !== "ping").map((e) => e.type))).sort(),
+    [events]
+  )
+  const filteredEvents = useMemo(() => {
+    const term = eventSearch.trim().toLowerCase()
+    return events
+      .filter((e) => e.type !== "ping")
+      .filter((e) => eventTypeFilter === "all" ? true : e.type === eventTypeFilter)
+      .filter((e) => {
+        if (!term) return true
+        const payload = JSON.stringify(e.payload || {}).toLowerCase()
+        return (e.type || "").toLowerCase().includes(term) || payload.includes(term)
+      })
+  }, [events, eventTypeFilter, eventSearch])
 
   // ── Tabs para o painel central ──
   const TABS = [
@@ -479,7 +521,7 @@ export default function AcademyDesk() {
       }}
     >
       {/* ── ROW 1: Top Bar ── */}
-      <TopBar kpis={kpis} wsState={wsState} onRefresh={loadAll} />
+      <TopBar kpis={kpis} wsState={wsState} wsStats={wsStats} onRefresh={loadAll} />
 
       {/* ── ROW 2: Main Grid ── */}
       <div
@@ -590,7 +632,37 @@ export default function AcademyDesk() {
         className="overflow-hidden"
         toolbar={
           <div className="flex items-center gap-2">
-            <span className="text-[10px] text-gray-500">{events.filter((e) => e.type !== "ping").length} eventos</span>
+            <span className="text-[10px] text-gray-500">{filteredEvents.length} eventos</span>
+            <select
+              value={eventTypeFilter}
+              onChange={(e) => setEventTypeFilter(e.target.value)}
+              className="text-[10px] px-2 py-0.5 rounded"
+              style={{ background: "#0d0d14", color: "#94a3b8", border: "1px solid #1e1e2e" }}
+            >
+              <option value="all">Todos os tipos</option>
+              {eventTypes.map((t) => <option key={t} value={t}>{t}</option>)}
+            </select>
+            <input
+              value={eventSearch}
+              onChange={(e) => setEventSearch(e.target.value)}
+              placeholder="Buscar payload..."
+              className="text-[10px] px-2 py-0.5 rounded w-28"
+              style={{ background: "#0d0d14", color: "#94a3b8", border: "1px solid #1e1e2e" }}
+            />
+            <button
+              onClick={() => setFeedPaused((v) => !v)}
+              className="text-[10px] font-bold px-2 py-0.5 rounded"
+              style={{ background: feedPaused ? "#7f1d1d" : "#14532d", color: feedPaused ? "#fca5a5" : "#86efac" }}
+            >
+              {feedPaused ? "▶ Retomar" : "⏸ Pausar"}
+            </button>
+            <button
+              onClick={() => setEvents([])}
+              className="text-[10px] px-2 py-0.5 rounded"
+              style={{ background: "#1f2937", color: "#cbd5e1" }}
+            >
+              Limpar
+            </button>
             <span
               className="text-[10px] font-bold px-2 py-0.5 rounded-full"
               style={{ background: wsState === "open" ? "#14532d" : "#7f1d1d", color: wsState === "open" ? "#4ade80" : "#f87171" }}
@@ -605,7 +677,7 @@ export default function AcademyDesk() {
           className="flex gap-3 overflow-x-auto pb-1"
           style={{ flexDirection: "row", alignItems: "flex-start" }}
         >
-          {events.filter((e) => e.type !== "ping").slice(-20).reverse().map((e, i) => {
+          {filteredEvents.slice(-20).reverse().map((e, i) => {
             const color = EVENT_COLORS[e.type] || "#94a3b8"
             return (
               <div
@@ -630,7 +702,7 @@ export default function AcademyDesk() {
               </div>
             )
           })}
-          {!events.filter((e) => e.type !== "ping").length && (
+          {!filteredEvents.length && (
             <p className="text-xs text-gray-600">Aguardando eventos WebSocket…</p>
           )}
         </div>
