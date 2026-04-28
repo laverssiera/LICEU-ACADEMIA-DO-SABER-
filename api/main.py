@@ -341,8 +341,8 @@ class AutoCertifyRequest(BaseModel):
 class OnboardingRequest(BaseModel):
     user_id: str
     name: str | None = None
-    role: str
-    contract_type: str
+    role: str = "operacional"
+    contract_type: str = "clt"
 
 
 class LegalAcceptRequest(BaseModel):
@@ -656,6 +656,17 @@ async def simulate_deal(body: SimulateDealRequest, _user=require_permission("san
     }
 
 
+@app.post("/academy/simulate", tags=["Issue 9 — Simulation Engine"])
+async def simulate_compat(_user=require_permission("sandbox", "execute")):
+    """Alias compatível com a rota simplificada do blueprint institucional."""
+    return {
+        "scenario": "cliente indeciso",
+        "options": ["pressionar", "educar", "desconto"],
+        "hint": "Use abordagem consultiva antes de conceder benefício comercial.",
+        "generated_at": datetime.utcnow().isoformat(),
+    }
+
+
 # ──────────────────────────────────────────────────────────────────────────────
 # ISSUE 8 — Replay de Operações Reais
 # ──────────────────────────────────────────────────────────────────────────────
@@ -806,19 +817,28 @@ async def compliance_check(body: ComplianceCheckRequest, _user=require_permissio
     }
 
 
+@app.post("/academy/compliance", tags=["Issues 13-14 — JuridicoTech"])
+async def compliance_compat(user_id: str = Query(...), _user=require_permission("legal", "read")):
+    """Alias compatível: valida e publica integração jurídica a partir de user_id."""
+    await publish("juridico.validate_training", {"user": user_id})
+    return {"ok": True, "user_id": user_id, "event": "juridico.validate_training published"}
+
+
 # ──────────────────────────────────────────────────────────────────────────────
 # ISSUES 15-16 — Metrics & Performance
 # ──────────────────────────────────────────────────────────────────────────────
 @app.get("/academy/dashboard", tags=["Issues 15-16 — Metrics"])
 async def dashboard():
     """Endpoint público/leve para o frontend React."""
+    ranking = sorted(gamification_db, key=lambda s: s.get("score", 0), reverse=True)[:10]
     return {
         "courses": courses_db[:20],
         "progress": {e["course_id"]: e["progress"] for e in enrollments_db},
+        "ranking": [{"user_id": s.get("user_id"), "score": s.get("score", 0)} for s in ranking],
         "recommendations": [
-            {"id": 1, "title": "Treinar negociação"},
-            {"id": 2, "title": "Revisar jurídico"},
-            {"id": 3, "title": "Completar CORE LICEU"},
+            {"id": 1, "message": "Usuário precisa reforçar negociação", "confidence": 0.87},
+            {"id": 2, "message": "Revisar jurídico antes da próxima simulação", "confidence": 0.81},
+            {"id": 3, "message": "Completar CORE LICEU para liberar trilhas avançadas", "confidence": 0.84},
         ],
     }
 
