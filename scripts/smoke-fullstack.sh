@@ -5,6 +5,9 @@ BASE_URL="${BASE_URL:-http://localhost:8010}"
 OUT_FILE="${1:-reports/smoke-fullstack-report.json}"
 HOLDING_USER_ID="${HOLDING_USER_ID:-HLD-002}"
 TIMEOUT_SECONDS="${TIMEOUT_SECONDS:-15}"
+RUN_ID="$(date +%s)"
+SMOKE_USER_ID="USR-SMOKE-${RUN_ID}"
+SMOKE_ONBOARD_USER_ID="USR-ONBOARD-${RUN_ID}"
 
 mkdir -p "$(dirname "$OUT_FILE")"
 
@@ -34,6 +37,7 @@ run_check() {
   local path="$3"
   local expected_code="$4"
   local body="${5:-}"
+  local user_id="${6:-$HOLDING_USER_ID}"
 
   TOTAL=$((TOTAL + 1))
 
@@ -42,12 +46,12 @@ run_check() {
   if [[ -n "$body" ]]; then
     response="$(curl -sS -m "$TIMEOUT_SECONDS" -w '\n%{http_code}' \
       -H "Content-Type: application/json" \
-      -H "x-holding-user-id: ${HOLDING_USER_ID}" \
+        -H "x-holding-user-id: ${user_id}" \
       -X "$method" "$url" \
       -d "$body" || true)"
   else
     response="$(curl -sS -m "$TIMEOUT_SECONDS" -w '\n%{http_code}' \
-      -H "x-holding-user-id: ${HOLDING_USER_ID}" \
+        -H "x-holding-user-id: ${user_id}" \
       -X "$method" "$url" || true)"
   fi
 
@@ -90,15 +94,15 @@ echo "Iniciando smoke test full stack em ${BASE_URL}"
 
 # Bloco 2/11: Core + Dashboard + Frontend data
 run_check "B02_DASHBOARD" "GET" "/academy/dashboard" "200"
-run_check "B02_ENROLL" "POST" "/academy/enroll" "201" '{"user_id":"USR-001","course_id":"CRS-001","source":"smoke"}'
-run_check "B02_LESSON_COMPLETE" "POST" "/academy/lesson/complete" "200" '{"user_id":"USR-001","lesson_id":"LSN-001","score":82}'
+run_check "B02_ENROLL" "POST" "/academy/enroll" "201" "{\"user_id\":\"${SMOKE_USER_ID}\",\"course_id\":\"CRS-001\",\"source\":\"smoke\"}"
+run_check "B02_LESSON_COMPLETE" "POST" "/academy/lesson/complete" "200" "{\"user_id\":\"${SMOKE_USER_ID}\",\"lesson_id\":\"LSN-001-${RUN_ID}\",\"score\":82}"
 
 # Bloco 5/6: Compliance + HubBackoffice
-run_check "B05_COMPLIANCE" "POST" "/academy/compliance?user_id=USR-001" "200"
-run_check "B06_ONBOARDING" "POST" "/academy/onboarding" "201" '{"user_id":"USR-009","role":"vendas","contract_type":"clt"}'
+run_check "B05_COMPLIANCE" "POST" "/academy/compliance?user_id=${SMOKE_USER_ID}" "200"
+run_check "B06_ONBOARDING" "POST" "/academy/onboarding" "201" "{\"user_id\":\"${SMOKE_ONBOARD_USER_ID}\",\"role\":\"vendas\",\"contract_type\":\"clt\"}"
 
 # Bloco 7/8: Simulação + Kanban
-run_check "B07_SIMULATE" "POST" "/academy/simulate" "200"
+run_check "B07_SIMULATE" "POST" "/academy/simulate" "200" "" "HLD-005"
 run_check "B08_FROM_TASK" "POST" "/academy/from-task" "201" '{"task_id":"TASK-001","domain":"negociacao"}'
 
 # Bloco 9/10: Métricas + RBAC
