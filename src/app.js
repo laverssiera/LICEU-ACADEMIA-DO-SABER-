@@ -36,7 +36,9 @@ const {
   whitelabels,
   educationalRoles,
   johnDnaFeed,
-  taskLearnings
+  monolithRbac,
+  taskLearnings,
+  feedbackLoops
 } = require("./data");
 
 const app = express();
@@ -1276,6 +1278,104 @@ app.post("/academy/kanban/task-learning", ...withPermission("kanban_learning", "
   }
 
   return res.status(201).json(record);
+}));
+
+// ─── ISSUE 29: Permissão de trilha por monólito (RBAC por domínio) ───────────
+
+app.get("/academy/monolith-rbac", ...withPermission("rbac_edu", "read", (_req, res) => {
+  res.json(monolithRbac);
+}));
+
+app.get("/academy/monolith-rbac/:monolith", ...withPermission("rbac_edu", "read", (req, res) => {
+  const key = String(req.params.monolith).toLowerCase();
+  const record = monolithRbac[key];
+
+  if (!record) {
+    return res.status(404).json({
+      error: "Monolito nao encontrado.",
+      available: Object.keys(monolithRbac)
+    });
+  }
+
+  return res.json({ monolith: key, ...record });
+}));
+
+// ─── ISSUE 33: Feedback loop — erro → aprendizado → melhoria → execução ──────
+
+app.post("/academy/feedback-loop", ...withPermission("academy_domain", "write", (req, res) => {
+  const { userId, errorType, sourceSystem, errorDescription, domain } = req.body;
+
+  if (!userId || !errorType || !sourceSystem) {
+    return res.status(400).json({ error: "Campos obrigatorios: userId, errorType, sourceSystem." });
+  }
+
+  const domainMap = {
+    deal: "vendas",
+    contract: "juridico",
+    financial: "financeiro",
+    audit: "compliance",
+    loss: "operacoes"
+  };
+
+  const resolvedDomain = domain || domainMap[String(errorType).toLowerCase()] || "geral";
+
+  // Passo 1: gera lição baseada no erro
+  const lesson = {
+    id: errorLessons.length + 1,
+    userId,
+    errorType,
+    sourceSystem,
+    errorDescription: errorDescription || null,
+    generatedLesson: {
+      title: `Licao de reforco: ${errorType} em ${sourceSystem}`,
+      domain: resolvedDomain,
+      content: `Ciclo de feedback iniciado. Revise modulos de ${resolvedDomain}.`,
+      exercises: [
+        `Simulacao de cenario: ${errorType}`,
+        "Revisao dos paradigmas do dominio",
+        "Teste de absorcao (re-execucao)"
+      ],
+      estimatedDuration: "45min"
+    },
+    createdAt: new Date().toISOString()
+  };
+  errorLessons.push(lesson);
+
+  // Passo 2: publica evento de recomendação do John
+  emitAcademyEvent("academy.john_recommended", { userId, lessonId: lesson.id, trigger: "feedback_loop" });
+
+  // Passo 3: registra ciclo no tracker
+  const loop = {
+    id: feedbackLoops.length + 1,
+    userId,
+    errorType,
+    sourceSystem,
+    domain: resolvedDomain,
+    steps: [
+      { step: 1, label: "erro_registrado", completedAt: new Date().toISOString() },
+      { step: 2, label: "licao_gerada", completedAt: new Date().toISOString() },
+      { step: 3, label: "treinamento_pendente", completedAt: null },
+      { step: 4, label: "score_atualizado", completedAt: null },
+      { step: 5, label: "core_dna_alimentado", completedAt: null },
+      { step: 6, label: "reexecucao_recomendada", completedAt: null }
+    ],
+    status: "in_progress",
+    lessonId: lesson.id,
+    startedAt: new Date().toISOString()
+  };
+  feedbackLoops.push(loop);
+
+  return res.status(201).json({
+    message: "Ciclo de feedback iniciado com sucesso.",
+    loop,
+    lesson
+  });
+}));
+
+app.get("/academy/feedback-loop/:userId", ...withPermission("academy_domain", "read", (req, res) => {
+  const { userId } = req.params;
+  const loops = feedbackLoops.filter((l) => l.userId === userId);
+  return res.json(loops);
 }));
 
 module.exports = app;

@@ -299,8 +299,50 @@ const educationalRoles = {
 // Issue 28 — John DNA Feed
 const johnDnaFeed = [];
 
+// Issue 29 — RBAC por domínio/monólito
+const monolithRbac = {
+  archimedes: {
+    required_tracks: ["cultura_liceu", "vendas", "juridico_basico"],
+    optional_tracks: ["bim_avancado", "financeiro", "crm"],
+    admin_only_tracks: ["master_class_imobi"]
+  },
+  opera: {
+    required_tracks: ["cultura_liceu", "opera", "bim_basico"],
+    optional_tracks: ["iot_predial", "microgrid", "manutencao_predial"],
+    admin_only_tracks: ["planejamento_avancado"]
+  },
+  cea: {
+    required_tracks: ["cultura_liceu", "cea", "compliance"],
+    optional_tracks: ["credito_avancado", "fii"],
+    admin_only_tracks: ["trading_financeiro"]
+  },
+  juridico: {
+    required_tracks: ["cultura_liceu", "lgpd", "contratos", "nao_circunvencao"],
+    optional_tracks: ["compliance_avancado"],
+    admin_only_tracks: ["parecer_juridico"]
+  },
+  cefeida: {
+    required_tracks: ["cultura_liceu", "cefeida_data", "python_basico"],
+    optional_tracks: ["ml_avancado", "analytics"],
+    admin_only_tracks: ["ia_estrategica"]
+  },
+  john: {
+    required_tracks: ["cultura_liceu", "uso_john"],
+    optional_tracks: ["prompts_avancados", "ia_governanca"],
+    admin_only_tracks: ["john_config_admin"]
+  },
+  gameMkt: {
+    required_tracks: ["cultura_liceu", "marketing_digital"],
+    optional_tracks: ["growth_hacking", "content_strategy"],
+    admin_only_tracks: ["budget_campanhas"]
+  }
+};
+
 // Issue 30 — Kanban task learning
 const taskLearnings = [];
+
+// Issue 33 — Feedback loop tracker
+const feedbackLoops = [];
 
 module.exports = {
   school,
@@ -353,6 +395,10 @@ module.exports = {
   educationalRoles,
   // Issue 28
   johnDnaFeed,
+  // Issue 29
+  monolithRbac,
   // Issue 30
-  taskLearnings
+  taskLearnings,
+  // Issue 33
+  feedbackLoops
 };

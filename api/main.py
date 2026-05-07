@@ -169,6 +169,46 @@ whitelabels_db: list[dict] = []
 cefeida_analyses_db: list[dict] = []
 dynamic_contents_db: list[dict] = []
 gamification_db: list[dict] = []
+feedback_loops_db: list[dict] = []
+
+# ISSUE 29 — RBAC por monólito
+MONOLITH_RBAC: dict[str, dict] = {
+    "archimedes": {
+        "required_tracks":    ["cultura_liceu", "vendas", "juridico_basico"],
+        "optional_tracks":    ["bim_avancado", "financeiro", "crm"],
+        "admin_only_tracks":  ["master_class_imobi"],
+    },
+    "opera": {
+        "required_tracks":    ["cultura_liceu", "opera", "bim_basico"],
+        "optional_tracks":    ["iot_predial", "microgrid", "manutencao_predial"],
+        "admin_only_tracks":  ["planejamento_avancado"],
+    },
+    "cea": {
+        "required_tracks":    ["cultura_liceu", "cea", "compliance"],
+        "optional_tracks":    ["credito_avancado", "fii"],
+        "admin_only_tracks":  ["trading_financeiro"],
+    },
+    "juridico": {
+        "required_tracks":    ["cultura_liceu", "lgpd", "contratos", "nao_circunvencao"],
+        "optional_tracks":    ["compliance_avancado"],
+        "admin_only_tracks":  ["parecer_juridico"],
+    },
+    "cefeida": {
+        "required_tracks":    ["cultura_liceu", "cefeida_data", "python_basico"],
+        "optional_tracks":    ["ml_avancado", "analytics"],
+        "admin_only_tracks":  ["ia_estrategica"],
+    },
+    "john": {
+        "required_tracks":    ["cultura_liceu", "uso_john"],
+        "optional_tracks":    ["prompts_avancados", "ia_governanca"],
+        "admin_only_tracks":  ["john_config_admin"],
+    },
+    "gameMkt": {
+        "required_tracks":    ["cultura_liceu", "marketing_digital"],
+        "optional_tracks":    ["growth_hacking", "content_strategy"],
+        "admin_only_tracks":  ["budget_campanhas"],
+    },
+}
 
 # Core LICEU Training seed
 tracks_db = [
@@ -1146,3 +1186,101 @@ async def kanban_task_learning(body: KanbanTaskRequest, _user=require_permission
         await publish("academy.task.learning_generated", {"user_id": body.user_id, "task_id": body.task_id, "domain": body.task_domain})
         await publish("academy.john_recommended", {"user_id": body.user_id, "trigger": "kanban_task", "domain": body.task_domain})
     return record
+
+
+# ──────────────────────────────────────────────────────────────────────────────
+# ISSUE 29 — RBAC por Domínio / Monólito
+# ──────────────────────────────────────────────────────────────────────────────
+@app.get("/academy/monolith-rbac", tags=["Issue 29 — RBAC por Domínio"])
+async def list_monolith_rbac(_user=require_permission("courses", "read")):
+    """Retorna o mapeamento completo de permissões de trilha por monólito."""
+    return MONOLITH_RBAC
+
+
+@app.get("/academy/monolith-rbac/{monolith}", tags=["Issue 29 — RBAC por Domínio"])
+async def get_monolith_rbac(monolith: str, _user=require_permission("courses", "read")):
+    """Retorna required_tracks, optional_tracks e admin_only_tracks de um monólito."""
+    key = monolith.lower()
+    record = MONOLITH_RBAC.get(key)
+    if not record:
+        raise HTTPException(404, f"Monólito '{monolith}' não encontrado. Disponíveis: {list(MONOLITH_RBAC)}")
+    return {"monolith": key, **record}
+
+
+# ──────────────────────────────────────────────────────────────────────────────
+# ISSUE 33 — Feedback Loop Completo
+# ──────────────────────────────────────────────────────────────────────────────
+class FeedbackLoopRequest(BaseModel):
+    user_id: str
+    error_type: str
+    source_system: str
+    error_description: str | None = None
+    domain: str | None = None
+
+
+@app.post("/academy/feedback-loop", status_code=201, tags=["Issue 33 — Feedback Loop"])
+async def start_feedback_loop(body: FeedbackLoopRequest, _user=require_permission("courses", "read")):
+    """
+    Inicia o ciclo completo de feedback:
+    erro registrado → lição gerada → treinamento pendente →
+    score atualizado → Core_DNA alimentado → reexecução recomendada.
+    """
+    domain_map = {
+        "deal": "vendas", "contract": "juridico",
+        "financial": "financeiro", "audit": "compliance", "loss": "operacoes",
+    }
+    resolved_domain = body.domain or domain_map.get(body.error_type.lower(), "geral")
+
+    # Passo 1 — gera lição automática
+    lesson = {
+        "id": str(uuid.uuid4()),
+        "user_id": body.user_id,
+        "error_type": body.error_type,
+        "source_system": body.source_system,
+        "generated_lesson": {
+            "title": f"Lição de reforço: {body.error_type} em {body.source_system}",
+            "domain": resolved_domain,
+            "content": f"Ciclo de feedback iniciado. Revise os módulos de {resolved_domain}.",
+            "exercises": [
+                f"Simulação de cenário: {body.error_type}",
+                "Revisão dos paradigmas do domínio",
+                "Teste de absorção (re-execução)",
+            ],
+            "estimated_duration": "45min",
+        },
+        "created_at": datetime.utcnow().isoformat(),
+    }
+    error_lessons_db.append(lesson)
+
+    # Passo 2 — publica eventos
+    await publish("academy.john_recommended", {"user_id": body.user_id, "lesson_id": lesson["id"], "trigger": "feedback_loop"})
+
+    now = datetime.utcnow().isoformat()
+    loop = {
+        "id": str(uuid.uuid4()),
+        "user_id": body.user_id,
+        "error_type": body.error_type,
+        "source_system": body.source_system,
+        "domain": resolved_domain,
+        "steps": [
+            {"step": 1, "label": "erro_registrado",        "completed_at": now},
+            {"step": 2, "label": "licao_gerada",           "completed_at": now},
+            {"step": 3, "label": "treinamento_pendente",   "completed_at": None},
+            {"step": 4, "label": "score_atualizado",       "completed_at": None},
+            {"step": 5, "label": "core_dna_alimentado",    "completed_at": None},
+            {"step": 6, "label": "reexecucao_recomendada", "completed_at": None},
+        ],
+        "status": "in_progress",
+        "lesson_id": lesson["id"],
+        "started_at": now,
+    }
+    feedback_loops_db.append(loop)
+
+    return {"message": "Ciclo de feedback iniciado com sucesso.", "loop": loop, "lesson": lesson}
+
+
+@app.get("/academy/feedback-loop/{user_id}", tags=["Issue 33 — Feedback Loop"])
+async def list_feedback_loops(user_id: str, _user=require_permission("courses", "read")):
+    """Retorna todos os ciclos de feedback de um usuário."""
+    return [l for l in feedback_loops_db if l["user_id"] == user_id]
+
