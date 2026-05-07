@@ -369,17 +369,17 @@ As 35 frentes do projeto foram registradas em issues rastreáveis:
 | Bloco 2 | John Training Engine | 3 | Concluido |
 | Bloco 3 | Treinamento Operacional | 3 | Concluido |
 | Bloco 4 | HubBackoffice (RH + DP) | 3 | Concluido |
-| Bloco 5 | JuridicoTech | 2 | Em andamento |
-| Bloco 6 | Metrics | 2 | Aberto |
-| Bloco 7 | EdTech Externo | 3 | Aberto |
-| Bloco 8 | NATS | 3 | Aberto |
-| Bloco 9 | CEFEIDA | 2 | Aberto |
-| Bloco 10 | Trading Desk | 2 | Aberto |
+| Bloco 5 | JuridicoTech | 2 | Concluido |
+| Bloco 6 | Metrics | 2 | Concluido |
+| Bloco 7 | EdTech Externo | 3 | Concluido |
+| Bloco 8 | NATS | 3 | Concluido |
+| Bloco 9 | CEFEIDA | 2 | Concluido |
+| Bloco 10 | Trading Desk | 2 | Concluido |
 | Bloco 11 | RBAC | 2 | Aberto |
 | Bloco 12 | Core_DNA + John | 2 | Aberto |
 | Bloco 13 | Kanban Global | 2 | Aberto |
 | Bloco 14 | Infra / Deploy | 2 | Aberto |
-| **Total** |  | **35** | **21 abertas / 14 fechadas** |
+| **Total** |  | **35** | **8 abertas / 27 fechadas** |
 <!-- ROADMAP_STATUS_TABLE:END -->
 
 - [ISSUE 1 - Criar domínio educacional (core academy)](https://github.com/laverssiera/LICEU-ACADEMIA-DO-SABER-/issues/2)
