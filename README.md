@@ -375,11 +375,11 @@ As 35 frentes do projeto foram registradas em issues rastreáveis:
 | Bloco 8 | NATS | 3 | Concluido |
 | Bloco 9 | CEFEIDA | 2 | Concluido |
 | Bloco 10 | Trading Desk | 2 | Concluido |
-| Bloco 11 | RBAC | 2 | Aberto |
-| Bloco 12 | Core_DNA + John | 2 | Aberto |
-| Bloco 13 | Kanban Global | 2 | Aberto |
-| Bloco 14 | Infra / Deploy | 2 | Aberto |
-| **Total** |  | **35** | **8 abertas / 27 fechadas** |
+| Bloco 11 | RBAC | 2 | Concluido |
+| Bloco 12 | Core_DNA + John | 2 | Concluido |
+| Bloco 13 | Kanban Global | 2 | Concluido |
+| Bloco 14 | Infra / Deploy | 2 | Concluido |
+| **Total** |  | **35** | **0 abertas / 35 fechadas** |
 <!-- ROADMAP_STATUS_TABLE:END -->
 
 - [ISSUE 1 - Criar domínio educacional (core academy)](https://github.com/laverssiera/LICEU-ACADEMIA-DO-SABER-/issues/2)
