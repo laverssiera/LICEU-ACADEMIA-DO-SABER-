@@ -365,11 +365,11 @@ As 35 frentes do projeto foram registradas em issues rastreáveis:
 <!-- ROADMAP_STATUS_TABLE:BEGIN -->
 | Bloco | Tema | Quantidade de Issues | Status |
 |-------|------|----------------------|--------|
-| Bloco 1 | Foundation | 4 | Aberto |
-| Bloco 2 | John Training Engine | 3 | Aberto |
-| Bloco 3 | Treinamento Operacional | 3 | Aberto |
-| Bloco 4 | HubBackoffice (RH + DP) | 3 | Aberto |
-| Bloco 5 | JuridicoTech | 2 | Aberto |
+| Bloco 1 | Foundation | 4 | Concluido |
+| Bloco 2 | John Training Engine | 3 | Concluido |
+| Bloco 3 | Treinamento Operacional | 3 | Concluido |
+| Bloco 4 | HubBackoffice (RH + DP) | 3 | Concluido |
+| Bloco 5 | JuridicoTech | 2 | Em andamento |
 | Bloco 6 | Metrics | 2 | Aberto |
 | Bloco 7 | EdTech Externo | 3 | Aberto |
 | Bloco 8 | NATS | 3 | Aberto |
@@ -379,7 +379,7 @@ As 35 frentes do projeto foram registradas em issues rastreáveis:
 | Bloco 12 | Core_DNA + John | 2 | Aberto |
 | Bloco 13 | Kanban Global | 2 | Aberto |
 | Bloco 14 | Infra / Deploy | 2 | Aberto |
-| **Total** |  | **35** | **35 abertas / 0 fechadas** |
+| **Total** |  | **35** | **21 abertas / 14 fechadas** |
 <!-- ROADMAP_STATUS_TABLE:END -->
 
 - [ISSUE 1 - Criar domínio educacional (core academy)](https://github.com/laverssiera/LICEU-ACADEMIA-DO-SABER-/issues/2)
