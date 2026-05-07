@@ -365,21 +365,21 @@ As 35 frentes do projeto foram registradas em issues rastreáveis:
 <!-- ROADMAP_STATUS_TABLE:BEGIN -->
 | Bloco | Tema | Quantidade de Issues | Status |
 |-------|------|----------------------|--------|
-| Bloco 1 | Foundation | 4 | Aberto |
-| Bloco 2 | John Training Engine | 3 | Aberto |
-| Bloco 3 | Treinamento Operacional | 3 | Aberto |
-| Bloco 4 | HubBackoffice (RH + DP) | 3 | Aberto |
-| Bloco 5 | JuridicoTech | 2 | Aberto |
-| Bloco 6 | Metrics | 2 | Aberto |
-| Bloco 7 | EdTech Externo | 3 | Aberto |
-| Bloco 8 | NATS | 3 | Aberto |
-| Bloco 9 | CEFEIDA | 2 | Aberto |
-| Bloco 10 | Trading Desk | 2 | Aberto |
-| Bloco 11 | RBAC | 2 | Aberto |
-| Bloco 12 | Core_DNA + John | 2 | Aberto |
-| Bloco 13 | Kanban Global | 2 | Aberto |
-| Bloco 14 | Infra / Deploy | 2 | Aberto |
-| **Total** |  | **35** | **35 abertas / 0 fechadas** |
+| Bloco 1 | Foundation | 4 | ✅ Fechado |
+| Bloco 2 | John Training Engine | 3 | ✅ Fechado |
+| Bloco 3 | Treinamento Operacional | 3 | ✅ Fechado |
+| Bloco 4 | HubBackoffice (RH + DP) | 3 | ✅ Fechado |
+| Bloco 5 | JuridicoTech | 2 | ✅ Fechado |
+| Bloco 6 | Metrics | 2 | ✅ Fechado |
+| Bloco 7 | EdTech Externo | 3 | ✅ Fechado |
+| Bloco 8 | NATS | 3 | ✅ Fechado |
+| Bloco 9 | CEFEIDA | 2 | ✅ Fechado |
+| Bloco 10 | Trading Desk | 2 | ✅ Fechado |
+| Bloco 11 | RBAC | 2 | ✅ Fechado |
+| Bloco 12 | Core_DNA + John | 2 | ✅ Fechado |
+| Bloco 13 | Kanban Global | 2 | ✅ Fechado |
+| Bloco 14 | Infra / Deploy | 2 | ✅ Fechado |
+| **Total** |  | **35** | **0 abertas / 35 fechadas** |
 <!-- ROADMAP_STATUS_TABLE:END -->
 
 - [ISSUE 1 - Criar domínio educacional (core academy)](https://github.com/laverssiera/LICEU-ACADEMIA-DO-SABER-/issues/2)
