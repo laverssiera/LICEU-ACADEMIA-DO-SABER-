@@ -344,6 +344,11 @@ const taskLearnings = [];
 // Issue 33 — Feedback loop tracker
 const feedbackLoops = [];
 
+// LICEU 7.0 — novos módulos operacionais
+const liveTeachings = [];
+const labSessions = [];
+const corporateUniversities = [];
+
 module.exports = {
   school,
   enrollments,
@@ -400,5 +405,9 @@ module.exports = {
   // Issue 30
   taskLearnings,
   // Issue 33
-  feedbackLoops
+  feedbackLoops,
+  // LICEU 7.0
+  liveTeachings,
+  labSessions,
+  corporateUniversities
 };

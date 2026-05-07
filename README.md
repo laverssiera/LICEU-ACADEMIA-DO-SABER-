@@ -1,4 +1,4 @@
-# LICEU ACADEMIA DO SABER
+# LICEU ACADEMIA DO SABER 7.0
 
 > **Missão:** Tornar o aprendizado uma constância vitalícia (3 a 120 anos).  
 > **Visão:** Ser o modelo global de educação interdisciplinar e prática.
@@ -7,15 +7,24 @@
 
 ## Sumário
 
-1. [Sobre o Projeto](#sobre-o-projeto)
-2. [Arquitetura](#arquitetura)
-3. [Serviços e Portas](#serviços-e-portas)
-4. [Como Executar](#como-executar)
+1. [Manifesto 7.0](#manifesto-70)
+2. [Nova Visão da Academia](#nova-visão-da-academia)
+3. [Conceito Operacional](#conceito-operacional)
+4. [Arquitetura Alvo 7.0](#arquitetura-alvo-70)
+5. [Módulos Estratégicos 7.0](#módulos-estratégicos-70)
+6. [Novos Endpoints 7.0](#novos-endpoints-70)
+7. [Evolução de Dados Cognitivos](#evolução-de-dados-cognitivos)
+8. [NATS e Escalabilidade](#nats-e-escalabilidade)
+9. [Épicos e Fases 7.0](#épicos-e-fases-70)
+10. [Sobre o Projeto (Estado Atual)](#sobre-o-projeto-estado-atual)
+11. [Arquitetura](#arquitetura)
+12. [Serviços e Portas](#serviços-e-portas)
+13. [Como Executar](#como-executar)
    - [Node.js (local)](#nodejs-local)
    - [FastAPI Python (local)](#fastapi-python-local)
    - [Docker Compose (stack completa)](#docker-compose-stack-completa)
-5. [Autenticação RBAC](#autenticação-rbac)
-6. [Endpoints da API](#endpoints-da-api)
+14. [Autenticação RBAC](#autenticação-rbac)
+15. [Endpoints da API](#endpoints-da-api)
    - [Estrutura Escolar](#estrutura-escolar)
    - [John Educacional (IA Pedagógica)](#john-educacional-ia-pedagógica)
    - [Gamificação](#gamificação)
@@ -32,16 +41,247 @@
    - [Core DNA + John como Professor](#core-dna--john-como-professor)
    - [Kanban Global e Feedback Loop](#kanban-global-e-feedback-loop)
    - [RBAC por Domínio (Monólito)](#rbac-por-domínio-monólito)
-7. [NATS JetStream — Streams e Eventos](#nats-jetstream--streams-e-eventos)
-8. [Schema SQL Enterprise](#schema-sql-enterprise)
-9. [Estrutura Educacional](#estrutura-educacional)
-10. [Testes Automatizados](#testes-automatizados)
-11. [CI/CD](#cicd)
-12. [Roadmap de Issues](#roadmap-de-issues)
+16. [NATS JetStream — Streams e Eventos](#nats-jetstream--streams-e-eventos)
+17. [Schema SQL Enterprise](#schema-sql-enterprise)
+18. [Estrutura Educacional](#estrutura-educacional)
+19. [Testes Automatizados](#testes-automatizados)
+20. [CI/CD](#cicd)
+21. [Roadmap de Issues](#roadmap-de-issues)
 
 ---
 
-## Sobre o Projeto
+## Manifesto 7.0
+
+"A infraestrutura educacional viva do ecossistema LICEU"
+
+A Academia deixa de ser uma plataforma de cursos e evolui para um **Sistema Operacional Cognitivo de Aprendizado Contínuo Global** integrado ao ecossistema:
+
+- HUBBACKOFFICE
+- GAME MKT
+- FORNECEDORES
+- ECONO.TECH
+- BIM.ARQ.ENG
+- OPERA
+- CORE DNA
+- JOHN
+- CEFEIDA
+- P&D.IA
+
+Resultado esperado: **engine de evolução humana do ecossistema**.
+
+---
+
+## Nova Visão da Academia
+
+| Camada | Objetivo |
+|--------|----------|
+| Educação Base | Crianças e jovens |
+| Formação Técnica | Profissionalização |
+| Educação Corporativa | Empresas |
+| Universidade LICEU | Engenharia, IA, BIM |
+| Academia Operacional | Obras reais |
+| Simuladores | Digital Twin |
+| Laboratórios | Físicos + virtuais |
+| Holografia | Ensino imersivo |
+| Marketplace Educacional | Especialistas externos |
+| Editora GAME MKT | Conteúdo didático |
+| IA Pedagógica | John + CEFEIDA |
+| Sistema Cognitivo | CORE DNA |
+| Universidade SaaS | White-label |
+| Centro de Pesquisa | P&D.IA |
+| Arena Competitiva | Gamificação |
+| Formação Industrial | Fornecedores |
+| Incubadora de Talentos | RH + HUB |
+| Academia Senior | 60+ |
+| Academia Infantil | 3–12 |
+| Academia Maker | Robótica/IoT |
+| Escola de Negócios | Holding/financeiro |
+| Escola ESG | Sustentabilidade |
+
+---
+
+## Conceito Operacional
+
+**ACADEMIA = Simulador de Vida Real.**
+
+O aluno passa a aprender por execução contextual:
+
+- operação de obras simuladas e reais
+- gestão de empresas e fluxo financeiro
+- resolução de problemas de campo
+- laboratório virtual e holografia
+- interação contínua com IA (John e CEFEIDA)
+- participação em squads e trading desks
+
+---
+
+## Arquitetura Alvo 7.0
+
+```text
+academy/
+├── apps/
+│   ├── api-node/
+│   ├── api-python/
+│   ├── frontend/
+│   ├── holographic-engine/
+│   ├── simulation-engine/
+│   ├── game-engine/
+│   ├── virtual-campus/
+│   ├── mobile/
+│   └── ai-learning-engine/
+├── modules/
+│   ├── john-teacher/
+│   ├── cefeida/
+│   ├── core-dna/
+│   ├── gamification/
+│   ├── holography/
+│   ├── virtual-labs/
+│   ├── publishing/
+│   ├── certifications/
+│   ├── edtech-marketplace/
+│   ├── corporate-training/
+│   ├── supplier-training/
+│   ├── university/
+│   ├── maker-space/
+│   ├── simulation/
+│   ├── live-classes/
+│   ├── streaming/
+│   ├── analytics/
+│   ├── esports-learning/
+│   ├── digital-twin-campus/
+│   └── cognitive-analysis/
+├── infra/
+├── kubernetes/
+├── terraform/
+├── docker/
+└── docs/
+```
+
+---
+
+## Módulos Estratégicos 7.0
+
+1. **John Professor 7.0:** aula ao vivo adaptativa, voz, simulação e prevenção de evasão.
+2. **CORE DNA Educacional:** mapeamento cognitivo profundo e evolução de perfil.
+3. **Laboratórios Virtuais:** estrutural, BIM, robótica, ESG, financeiro, industrial, energia e IA.
+4. **Campus Digital Twin:** campus 3D com avatar, auditórios, fábricas e cidade virtual.
+5. **Game Engine Educacional:** XP, níveis, guildas, torneios e economia gamificada.
+6. **Editora GAME MKT:** produção de livros, vídeos, podcasts, holografias e avaliações.
+7. **CEFEIDA Learning Engine:** detecção de sobrecarga e adaptação cognitiva contínua.
+8. **Streaming Nativo:** WebRTC, replay, tradução, legenda e analytics ao vivo.
+9. **Academia Infantil:** foco em criatividade, lógica, ciência e sustentabilidade.
+10. **Academia Longevidade:** inclusão digital e trilhas assistidas para 60+.
+11. **Academia Industrial:** trilhas para operadores, logística, qualidade e Six Sigma.
+12. **Corporate University SaaS:** white-label para empresas externas.
+13. **Marketplace Educacional:** venda de cursos, mentorias e simuladores.
+14. **Trading Desk 2.0:** KPIs cognitivos, heatmaps e learning economy.
+15. **Mobile App:** offline-first, voz, AR e laboratório mobile.
+16. **Sistema de Talentos:** detecção de líderes e integração com RH/HUBBACKOFFICE.
+17. **Holografia:** engine de professor holográfico e walkthrough BIM.
+18. **Integração com OPERA:** treinamento em recebimento, logística e execução.
+19. **Eventos NATS dedicados:** streams de holografia, simulação, cognitivo, marketplace e streaming.
+20. **Kubernetes:** desacoplamento de APIs, IA, streaming e consumidores NATS.
+21. **IA Operacional integrada:** John, CEFEIDA, Core DNA, P&D IA, Opera AI e Econo AI.
+22. **Universidade LICEU:** trilhas superiores com certificação avançada.
+23. **Token educacional:** incentivo de aprendizagem via ECONO.TECH.
+24. **Loop de evolução:** erro -> feedback -> treino -> Core DNA -> John -> melhoria operacional.
+
+---
+
+## Novos Endpoints 7.0
+
+| Método | Endpoint | Objetivo |
+|--------|----------|----------|
+| POST | `/john/academy/live-teaching` | Aula imersiva adaptativa em tempo real |
+| POST | `/academy/labs/start` | Iniciar laboratório virtual por domínio |
+| POST | `/corporate-university/create` | Provisionar universidade white-label |
+
+Exemplo de payload para aula imersiva:
+
+```json
+{
+  "student_id": "USR-001",
+  "topic": "Estruturas metálicas",
+  "mode": "immersive"
+}
+```
+
+Exemplo de resposta esperada:
+
+```json
+{
+  "lesson_id": "LESSON-9001",
+  "holographic_scene": true,
+  "difficulty_adapted": true,
+  "simulation_enabled": true,
+  "voice_tutor": "john_ptbr"
+}
+```
+
+---
+
+## Evolução de Dados Cognitivos
+
+Tabela proposta para evolução do CORE DNA educacional:
+
+```sql
+CREATE TABLE cognitive_dna (
+  id UUID PRIMARY KEY,
+  user_id UUID NOT NULL,
+  logical_score NUMERIC(5,2),
+  engineering_score NUMERIC(5,2),
+  leadership_score NUMERIC(5,2),
+  creativity_score NUMERIC(5,2),
+  emotional_score NUMERIC(5,2),
+  adaptive_learning_score NUMERIC(5,2),
+  burnout_risk NUMERIC(5,2),
+  generated_at TIMESTAMP DEFAULT now()
+);
+```
+
+---
+
+## NATS e Escalabilidade
+
+Streams novos planejados para 7.0:
+
+- `ACADEMY_HOLOGRAPHY`
+- `ACADEMY_SIMULATION`
+- `ACADEMY_COGNITIVE`
+- `ACADEMY_GAMIFICATION`
+- `ACADEMY_MARKETPLACE`
+- `ACADEMY_STREAMING`
+
+Workloads Kubernetes alvo:
+
+- `academy-api`
+- `academy-ai`
+- `academy-streaming`
+- `academy-websocket`
+- `academy-holography`
+- `academy-simulation`
+- `academy-frontend`
+- `academy-mobile-gateway`
+- `academy-nats-consumer`
+
+---
+
+## Épicos e Fases 7.0
+
+| Épico | Escopo | Resultado esperado |
+|-------|--------|--------------------|
+| E1 | Cognitive Core (John + CEFEIDA + CORE DNA) | Aprendizado adaptativo em tempo real |
+| E2 | Simulação e Holografia | Ambiente imersivo de prática |
+| E3 | Marketplace e Editora | Escala de conteúdo e especialistas |
+| E4 | Corporate University SaaS | Expansão B2B white-label |
+| E5 | Mobile + Streaming Nativo | Aprendizado ubiquo e síncrono |
+| E6 | Operação e Talentos | Integração Academia -> RH/HUB |
+
+Plano detalhado por fase, critérios de aceite e entregáveis: [docs/PLANO-7.0.md](docs/PLANO-7.0.md)
+
+---
+
+## Sobre o Projeto (Estado Atual)
 
 O **LICEU ACADEMIA DO SABER** é a plataforma de educação contínua do ecossistema LICEU 6.0 / LICEU ENGENHARIA, cobrindo desde o Ensino Fundamental até o Técnico Profissionalizante com prática real. O sistema expõe:
 

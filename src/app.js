@@ -38,7 +38,10 @@ const {
   johnDnaFeed,
   monolithRbac,
   taskLearnings,
-  feedbackLoops
+  feedbackLoops,
+  liveTeachings,
+  labSessions,
+  corporateUniversities
 } = require("./data");
 
 const app = express();
@@ -278,6 +281,30 @@ app.post("/academy/lab/material-test", ...withPermission("academy_lab", "write",
   return res.status(201).json(result);
 }));
 
+app.post("/academy/labs/start", ...withPermission("academy_lab", "write", (req, res) => {
+  const { studentId, labType, mode = "virtual", objective, durationMinutes } = req.body;
+
+  if (!studentId || !labType) {
+    return res.status(400).json({
+      error: "Campos obrigatorios: studentId e labType."
+    });
+  }
+
+  const session = {
+    id: labSessions.length + 1,
+    studentId,
+    labType,
+    mode,
+    objective: objective || `Experimento em ${labType}`,
+    durationMinutes: Number(durationMinutes) || 45,
+    status: "started",
+    createdAt: new Date().toISOString()
+  };
+
+  labSessions.push(session);
+  return res.status(201).json(session);
+}));
+
 app.get("/academy/lab/results", ...withPermission("academy_lab", "read", (_req, res) => {
   res.json(labResults);
 }));
@@ -363,6 +390,29 @@ app.post("/john/academy/learning-plan", ...withPermission("john_ai", "execute", 
       "Avaliacao continua e certificacao"
     ]
   });
+}));
+
+app.post("/john/academy/live-teaching", ...withPermission("john_teach", "execute", (req, res) => {
+  const { student_id: studentId, topic, mode = "immersive" } = req.body;
+
+  if (!studentId || !topic) {
+    return res.status(400).json({ error: "Campos obrigatorios: student_id e topic." });
+  }
+
+  const lesson = {
+    lesson_id: `LESSON-${9000 + liveTeachings.length + 1}`,
+    student_id: studentId,
+    topic,
+    mode,
+    holographic_scene: mode === "immersive",
+    difficulty_adapted: true,
+    simulation_enabled: true,
+    voice_tutor: "john_ptbr",
+    created_at: new Date().toISOString()
+  };
+
+  liveTeachings.push(lesson);
+  return res.status(201).json(lesson);
 }));
 
 app.get("/sdk/certification/tracks", ...withPermission("certification_sdk", "read", (_req, res) => {
@@ -1370,6 +1420,36 @@ app.post("/academy/feedback-loop", ...withPermission("academy_domain", "write", 
     loop,
     lesson
   });
+}));
+
+app.post("/corporate-university/create", ...withPermission("whitelabel", "write", (req, res) => {
+  const { companyId, companyName, tracks = [], useJohn = true, useCefeida = true } = req.body;
+
+  if (!companyId || !companyName) {
+    return res.status(400).json({ error: "Campos obrigatorios: companyId e companyName." });
+  }
+
+  if (!Array.isArray(tracks)) {
+    return res.status(400).json({ error: "tracks deve ser um array de strings." });
+  }
+
+  const university = {
+    id: `CU-${String(corporateUniversities.length + 1).padStart(4, "0")}`,
+    companyId,
+    companyName,
+    tracks,
+    features: {
+      john: Boolean(useJohn),
+      cefeida: Boolean(useCefeida),
+      simulators: true,
+      whiteLabel: true
+    },
+    status: "provisioned",
+    createdAt: new Date().toISOString()
+  };
+
+  corporateUniversities.push(university);
+  return res.status(201).json(university);
 }));
 
 app.get("/academy/feedback-loop/:userId", ...withPermission("academy_domain", "read", (req, res) => {

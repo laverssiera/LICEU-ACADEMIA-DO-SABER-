@@ -170,6 +170,9 @@ cefeida_analyses_db: list[dict] = []
 dynamic_contents_db: list[dict] = []
 gamification_db: list[dict] = []
 feedback_loops_db: list[dict] = []
+live_teachings_db: list[dict] = []
+lab_sessions_db: list[dict] = []
+corporate_universities_db: list[dict] = []
 
 # ISSUE 29 — RBAC por monólito
 MONOLITH_RBAC: dict[str, dict] = {
@@ -462,6 +465,28 @@ class SimulateDealRequest(BaseModel):
 class GenerateFromTaskRequest(BaseModel):
     task_id: str
     domain: str | None = None
+
+
+class JohnLiveTeachingRequest(BaseModel):
+    student_id: str
+    topic: str
+    mode: str = "immersive"
+
+
+class LabStartRequest(BaseModel):
+    student_id: str
+    lab_type: str
+    mode: str = "virtual"
+    objective: str | None = None
+    duration_minutes: int | None = 45
+
+
+class CorporateUniversityCreateRequest(BaseModel):
+    company_id: str
+    company_name: str
+    tracks: list[str] = []
+    use_john: bool = True
+    use_cefeida: bool = True
 
 
 # ──────────────────────────────────────────────────────────────────────────────
@@ -1145,6 +1170,62 @@ async def john_teach(body: JohnTeachRequest, _user=require_permission("john", "e
         },
         "generated_at": datetime.utcnow().isoformat(),
     }
+
+
+@app.post("/john/academy/live-teaching", status_code=201, tags=["LICEU 7.0 — John Live Teaching"])
+async def john_live_teaching(body: JohnLiveTeachingRequest, _user=require_permission("john", "execute")):
+    lesson = {
+        "lesson_id": f"LESSON-{9000 + len(live_teachings_db) + 1}",
+        "student_id": body.student_id,
+        "topic": body.topic,
+        "mode": body.mode,
+        "holographic_scene": body.mode == "immersive",
+        "difficulty_adapted": True,
+        "simulation_enabled": True,
+        "voice_tutor": "john_ptbr",
+        "created_at": datetime.utcnow().isoformat(),
+    }
+    live_teachings_db.append(lesson)
+    await publish("academy.john.live_teaching", lesson)
+    return lesson
+
+
+@app.post("/academy/labs/start", status_code=201, tags=["LICEU 7.0 — Virtual Labs"])
+async def academy_labs_start(body: LabStartRequest, _user=require_permission("courses", "read")):
+    session = {
+        "id": str(uuid.uuid4()),
+        "student_id": body.student_id,
+        "lab_type": body.lab_type,
+        "mode": body.mode,
+        "objective": body.objective or f"Experimento em {body.lab_type}",
+        "duration_minutes": body.duration_minutes or 45,
+        "status": "started",
+        "created_at": datetime.utcnow().isoformat(),
+    }
+    lab_sessions_db.append(session)
+    await publish("academy.lab.started", session)
+    return session
+
+
+@app.post("/corporate-university/create", status_code=201, tags=["LICEU 7.0 — Corporate University"])
+async def corporate_university_create(body: CorporateUniversityCreateRequest, _user=require_permission("whitelabel", "create")):
+    university = {
+        "id": f"CU-{str(len(corporate_universities_db) + 1).zfill(4)}",
+        "company_id": body.company_id,
+        "company_name": body.company_name,
+        "tracks": body.tracks,
+        "features": {
+            "john": body.use_john,
+            "cefeida": body.use_cefeida,
+            "simulators": True,
+            "white_label": True,
+        },
+        "status": "provisioned",
+        "created_at": datetime.utcnow().isoformat(),
+    }
+    corporate_universities_db.append(university)
+    await publish("academy.corporate_university.created", university)
+    return university
 
 
 # ──────────────────────────────────────────────────────────────────────────────

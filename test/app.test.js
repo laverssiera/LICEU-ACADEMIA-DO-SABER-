@@ -250,6 +250,50 @@ test("ISSUE 14 — Deve registrar aceite juridico e gerar assinatura", async () 
   assert.match(response.body.signature, /ACEITE/);
 });
 
+// ─── LICEU 7.0: Endpoints novos ───────────────────────────────────────────
+
+test("LICEU 7.0 — John live teaching deve criar aula imersiva", async () => {
+  const response = await request(app)
+    .post("/john/academy/live-teaching")
+    .set("x-holding-user-id", "HLD-004")
+    .send({ student_id: "USR-001", topic: "Estruturas metalicas", mode: "immersive" });
+
+  assert.equal(response.statusCode, 201);
+  assert.equal(response.body.student_id, "USR-001");
+  assert.equal(response.body.holographic_scene, true);
+  assert.equal(response.body.voice_tutor, "john_ptbr");
+});
+
+test("LICEU 7.0 — Labs start deve iniciar sessao de laboratorio", async () => {
+  const response = await request(app)
+    .post("/academy/labs/start")
+    .set("x-holding-user-id", "HLD-004")
+    .send({ studentId: "USR-002", labType: "BIM", mode: "virtual" });
+
+  assert.equal(response.statusCode, 201);
+  assert.equal(response.body.studentId, "USR-002");
+  assert.equal(response.body.labType, "BIM");
+  assert.equal(response.body.status, "started");
+});
+
+test("LICEU 7.0 — Corporate University deve provisionar ambiente white-label", async () => {
+  const response = await request(app)
+    .post("/corporate-university/create")
+    .set("x-holding-user-id", "HLD-002")
+    .send({
+      companyId: "COMP-001",
+      companyName: "Empresa XPTO",
+      tracks: ["bim", "lideranca"],
+      useJohn: true,
+      useCefeida: true
+    });
+
+  assert.equal(response.statusCode, 201);
+  assert.equal(response.body.companyId, "COMP-001");
+  assert.equal(response.body.features.whiteLabel, true);
+  assert.equal(response.body.status, "provisioned");
+});
+
 // ─── ISSUES 15-16: Métricas ──────────────────────────────────────────────────
 
 test("ISSUE 15 — Dashboard deve retornar KPIs", async () => {
