@@ -672,21 +672,21 @@ Pipeline em [.github/workflows/ci.yml](.github/workflows/ci.yml) — executa a c
 <!-- ROADMAP_STATUS_TABLE:BEGIN -->
 | Bloco | Tema | Quantidade de Issues | Status |
 |-------|------|----------------------|--------|
-| Bloco 1 | Foundation | 4 | ✅ Fechado |
-| Bloco 2 | John Training Engine | 3 | ✅ Fechado |
-| Bloco 3 | Treinamento Operacional | 3 | ✅ Fechado |
-| Bloco 4 | HubBackoffice (RH + DP) | 3 | ✅ Fechado |
-| Bloco 5 | JuridicoTech | 2 | ✅ Fechado |
-| Bloco 6 | Metrics | 2 | ✅ Fechado |
-| Bloco 7 | EdTech Externo | 3 | ✅ Fechado |
-| Bloco 8 | NATS | 3 | ✅ Fechado |
-| Bloco 9 | CEFEIDA | 2 | ✅ Fechado |
-| Bloco 10 | Trading Desk | 2 | ✅ Fechado |
-| Bloco 11 | RBAC | 2 | ✅ Fechado |
-| Bloco 12 | Core_DNA + John | 2 | ✅ Fechado |
-| Bloco 13 | Kanban Global | 2 | ✅ Fechado |
-| Bloco 14 | Infra / Deploy | 2 | ✅ Fechado |
-| **Total** | | **35** | **0 abertas / 35 fechadas** |
+| Bloco 1 | Foundation | 4 | Concluido |
+| Bloco 2 | John Training Engine | 3 | Concluido |
+| Bloco 3 | Treinamento Operacional | 3 | Concluido |
+| Bloco 4 | HubBackoffice (RH + DP) | 3 | Concluido |
+| Bloco 5 | JuridicoTech | 2 | Concluido |
+| Bloco 6 | Metrics | 2 | Concluido |
+| Bloco 7 | EdTech Externo | 3 | Concluido |
+| Bloco 8 | NATS | 3 | Concluido |
+| Bloco 9 | CEFEIDA | 2 | Concluido |
+| Bloco 10 | Trading Desk | 2 | Concluido |
+| Bloco 11 | RBAC | 2 | Concluido |
+| Bloco 12 | Core_DNA + John | 2 | Concluido |
+| Bloco 13 | Kanban Global | 2 | Concluido |
+| Bloco 14 | Infra / Deploy | 2 | Concluido |
+| **Total** |  | **35** | **0 abertas / 35 fechadas** |
 <!-- ROADMAP_STATUS_TABLE:END -->
 
 | # | Título | Status |
