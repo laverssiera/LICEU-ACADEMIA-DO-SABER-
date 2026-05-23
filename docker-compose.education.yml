@@ -1,0 +1,74 @@
+services:
+  federated-learning-runtime:
+    build:
+      context: ./academia-do-saber
+      dockerfile: Dockerfile.ecosystem
+    command: ["python", "runtime/federated_learning_runtime.py"]
+    ports:
+      - "8910:8910"
+    environment:
+      AUTH_ENABLED: "true"
+      JWT_SECRET: liceu-academia-secret
+      JWT_ALGORITHM: HS256
+      ACADEMIA_RUNTIME_HOST: 0.0.0.0
+      ACADEMIA_RUNTIME_PORT: "8910"
+      NATS_URL: nats://nats:4222
+      NEO4J_URI: bolt://neo4j:7687
+      NEO4J_USER: neo4j
+      NEO4J_PASSWORD: password
+    depends_on:
+      nats:
+        condition: service_started
+      redis:
+        condition: service_started
+      neo4j:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD-SHELL", "wget -qO- http://localhost:8910/health >/dev/null || exit 1"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  ecosystem-learning-runtime:
+    build:
+      context: ./academia-do-saber
+      dockerfile: Dockerfile.ecosystem
+    command: ["python", "ecosystem_learning_runtime.py"]
+    ports:
+      - "8010:8010"
+    environment:
+      AUTH_ENABLED: "true"
+      JWT_SECRET: liceu-academia-secret
+      JWT_ALGORITHM: HS256
+      ECOSYSTEM_RUNTIME_HOST: 0.0.0.0
+      ECOSYSTEM_RUNTIME_PORT: "8010"
+      ECOSYSTEM_CHROMA_PATH: /tmp/academia_chroma
+      ECOSYSTEM_CHROMA_COLLECTION: learning_memory
+      NEO4J_URI: bolt://neo4j:7687
+      NEO4J_USER: neo4j
+      NEO4J_PASSWORD: password
+    depends_on:
+      neo4j:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD-SHELL", "wget -qO- http://localhost:8010/health >/dev/null || exit 1"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  redis:
+    image: redis:7
+
+  neo4j:
+    image: neo4j:5
+    environment:
+      NEO4J_AUTH: neo4j/password
+    healthcheck:
+      test: ["CMD-SHELL", "cypher-shell -u neo4j -p password 'RETURN 1;' >/dev/null 2>&1 || exit 1"]
+      interval: 10s
+      timeout: 10s
+      retries: 10
+
+  nats:
+    image: nats:2.10
+    command: ["-js"]
