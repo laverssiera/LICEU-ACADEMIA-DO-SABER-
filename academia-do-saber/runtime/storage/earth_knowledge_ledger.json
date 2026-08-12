@@ -1,0 +1,592 @@
+{
+  "entries": [
+    {
+      "discipline": "earth_systems",
+      "knowledge_items": [
+        {
+          "content": "learning ecologies raise scientific retention",
+          "knowledge_type": "scientific_findings"
+        },
+        {
+          "content": "planetary adaptive model",
+          "knowledge_type": "models"
+        },
+        {
+          "content": "feedback loops improve curriculum continuity",
+          "knowledge_type": "lessons_learned"
+        },
+        {
+          "content": "distributed solar labs increase infrastructure uptime",
+          "knowledge_type": "engineering_knowledge"
+        },
+        {
+          "content": "skills compounding improves regional productivity",
+          "knowledge_type": "economic_knowledge"
+        },
+        {
+          "content": "local climate observatories accelerate adaptation",
+          "knowledge_type": "climate_knowledge"
+        }
+      ],
+      "researcher": "gaia",
+      "scientific_graph_nodes": {
+        "climate_knowledge": "earth_systems::local climate observatories accelerate adaptation",
+        "economic_knowledge": "earth_systems::skills compounding improves regional productivity",
+        "engineering_knowledge": "earth_systems::distributed solar labs increase infrastructure uptime",
+        "lessons_learned": "earth_systems::feedback loops improve curriculum continuity",
+        "models": "earth_systems::planetary adaptive model",
+        "scientific_findings": "earth_systems::learning ecologies raise scientific retention"
+      },
+      "scientific_graph_relations": [
+        {
+          "relation_type": "validated_by",
+          "source_key": "earth_systems::learning ecologies raise scientific retention",
+          "target_key": "earth_systems::planetary adaptive model",
+          "weight": 1.0
+        },
+        {
+          "relation_type": "implemented_by",
+          "source_key": "earth_systems::planetary adaptive model",
+          "target_key": "earth_systems::distributed solar labs increase infrastructure uptime",
+          "weight": 1.0
+        },
+        {
+          "relation_type": "mitigates",
+          "source_key": "earth_systems::distributed solar labs increase infrastructure uptime",
+          "target_key": "earth_systems::local climate observatories accelerate adaptation",
+          "weight": 1.0
+        },
+        {
+          "relation_type": "funds",
+          "source_key": "earth_systems::skills compounding improves regional productivity",
+          "target_key": "earth_systems::local climate observatories accelerate adaptation",
+          "weight": 1.0
+        },
+        {
+          "relation_type": "improves",
+          "source_key": "earth_systems::feedback loops improve curriculum continuity",
+          "target_key": "earth_systems::planetary adaptive model",
+          "weight": 1.0
+        }
+      ],
+      "student_id": "earth-student-01",
+      "timestamp": 1786248668.5940413
+    },
+    {
+      "discipline": "earth_systems",
+      "knowledge_items": [
+        {
+          "content": "systems learning increases retention",
+          "knowledge_type": "scientific_findings"
+        },
+        {
+          "content": "earth adaptive model",
+          "knowledge_type": "models"
+        },
+        {
+          "content": "feedback shortens adaptation cycles",
+          "knowledge_type": "lessons_learned"
+        },
+        {
+          "content": "solar labs strengthen local resilience",
+          "knowledge_type": "engineering_knowledge"
+        },
+        {
+          "content": "skills mobility expands local productivity",
+          "knowledge_type": "economic_knowledge"
+        },
+        {
+          "content": "community observatories improve adaptation readiness",
+          "knowledge_type": "climate_knowledge"
+        }
+      ],
+      "researcher": "gaia",
+      "scientific_graph_nodes": {
+        "climate_knowledge": "earth_systems::community observatories improve adaptation readiness",
+        "economic_knowledge": "earth_systems::skills mobility expands local productivity",
+        "engineering_knowledge": "earth_systems::solar labs strengthen local resilience",
+        "lessons_learned": "earth_systems::feedback shortens adaptation cycles",
+        "models": "earth_systems::earth adaptive model",
+        "scientific_findings": "earth_systems::systems learning increases retention"
+      },
+      "scientific_graph_relations": [
+        {
+          "relation_type": "validated_by",
+          "source_key": "earth_systems::systems learning increases retention",
+          "target_key": "earth_systems::earth adaptive model",
+          "weight": 1.0
+        },
+        {
+          "relation_type": "implemented_by",
+          "source_key": "earth_systems::earth adaptive model",
+          "target_key": "earth_systems::solar labs strengthen local resilience",
+          "weight": 1.0
+        },
+        {
+          "relation_type": "mitigates",
+          "source_key": "earth_systems::solar labs strengthen local resilience",
+          "target_key": "earth_systems::community observatories improve adaptation readiness",
+          "weight": 1.0
+        },
+        {
+          "relation_type": "funds",
+          "source_key": "earth_systems::skills mobility expands local productivity",
+          "target_key": "earth_systems::community observatories improve adaptation readiness",
+          "weight": 1.0
+        },
+        {
+          "relation_type": "improves",
+          "source_key": "earth_systems::feedback shortens adaptation cycles",
+          "target_key": "earth_systems::earth adaptive model",
+          "weight": 1.0
+        }
+      ],
+      "student_id": "earth-student-http",
+      "timestamp": 1786248775.9086862
+    },
+    {
+      "discipline": "earth_systems",
+      "knowledge_items": [
+        {
+          "content": "learning ecologies raise scientific retention",
+          "knowledge_type": "scientific_findings"
+        },
+        {
+          "content": "planetary adaptive model",
+          "knowledge_type": "models"
+        },
+        {
+          "content": "feedback loops improve curriculum continuity",
+          "knowledge_type": "lessons_learned"
+        },
+        {
+          "content": "distributed solar labs increase infrastructure uptime",
+          "knowledge_type": "engineering_knowledge"
+        },
+        {
+          "content": "skills compounding improves regional productivity",
+          "knowledge_type": "economic_knowledge"
+        },
+        {
+          "content": "local climate observatories accelerate adaptation",
+          "knowledge_type": "climate_knowledge"
+        }
+      ],
+      "researcher": "gaia",
+      "scientific_graph_nodes": {
+        "climate_knowledge": "earth_systems::local climate observatories accelerate adaptation",
+        "economic_knowledge": "earth_systems::skills compounding improves regional productivity",
+        "engineering_knowledge": "earth_systems::distributed solar labs increase infrastructure uptime",
+        "lessons_learned": "earth_systems::feedback loops improve curriculum continuity",
+        "models": "earth_systems::planetary adaptive model",
+        "scientific_findings": "earth_systems::learning ecologies raise scientific retention"
+      },
+      "scientific_graph_relations": [
+        {
+          "relation_type": "validated_by",
+          "source_key": "earth_systems::learning ecologies raise scientific retention",
+          "target_key": "earth_systems::planetary adaptive model",
+          "weight": 1.0
+        },
+        {
+          "relation_type": "implemented_by",
+          "source_key": "earth_systems::planetary adaptive model",
+          "target_key": "earth_systems::distributed solar labs increase infrastructure uptime",
+          "weight": 1.0
+        },
+        {
+          "relation_type": "mitigates",
+          "source_key": "earth_systems::distributed solar labs increase infrastructure uptime",
+          "target_key": "earth_systems::local climate observatories accelerate adaptation",
+          "weight": 1.0
+        },
+        {
+          "relation_type": "funds",
+          "source_key": "earth_systems::skills compounding improves regional productivity",
+          "target_key": "earth_systems::local climate observatories accelerate adaptation",
+          "weight": 1.0
+        },
+        {
+          "relation_type": "improves",
+          "source_key": "earth_systems::feedback loops improve curriculum continuity",
+          "target_key": "earth_systems::planetary adaptive model",
+          "weight": 1.0
+        }
+      ],
+      "student_id": "earth-student-01",
+      "timestamp": 1786248777.9787743
+    },
+    {
+      "discipline": "earth_systems",
+      "knowledge_items": [
+        {
+          "content": "planetary loops increase long-term retention",
+          "knowledge_type": "scientific_findings"
+        },
+        {
+          "content": "earth-cycle adaptive model",
+          "knowledge_type": "models"
+        },
+        {
+          "content": "continuous observability improves educational adaptation",
+          "knowledge_type": "lessons_learned"
+        },
+        {
+          "content": "distributed energy labs increase school uptime",
+          "knowledge_type": "engineering_knowledge"
+        },
+        {
+          "content": "skills stackability accelerates regional development",
+          "knowledge_type": "economic_knowledge"
+        },
+        {
+          "content": "local climate sensing improves adaptation execution",
+          "knowledge_type": "climate_knowledge"
+        }
+      ],
+      "researcher": "gaia-cycle",
+      "scientific_graph_nodes": {
+        "climate_knowledge": "earth_systems::local climate sensing improves adaptation execution",
+        "economic_knowledge": "earth_systems::skills stackability accelerates regional development",
+        "engineering_knowledge": "earth_systems::distributed energy labs increase school uptime",
+        "lessons_learned": "earth_systems::continuous observability improves educational adaptation",
+        "models": "earth_systems::earth-cycle adaptive model",
+        "scientific_findings": "earth_systems::planetary loops increase long-term retention"
+      },
+      "scientific_graph_relations": [
+        {
+          "relation_type": "validated_by",
+          "source_key": "earth_systems::planetary loops increase long-term retention",
+          "target_key": "earth_systems::earth-cycle adaptive model",
+          "weight": 1.0
+        },
+        {
+          "relation_type": "implemented_by",
+          "source_key": "earth_systems::earth-cycle adaptive model",
+          "target_key": "earth_systems::distributed energy labs increase school uptime",
+          "weight": 1.0
+        },
+        {
+          "relation_type": "mitigates",
+          "source_key": "earth_systems::distributed energy labs increase school uptime",
+          "target_key": "earth_systems::local climate sensing improves adaptation execution",
+          "weight": 1.0
+        },
+        {
+          "relation_type": "funds",
+          "source_key": "earth_systems::skills stackability accelerates regional development",
+          "target_key": "earth_systems::local climate sensing improves adaptation execution",
+          "weight": 1.0
+        },
+        {
+          "relation_type": "improves",
+          "source_key": "earth_systems::continuous observability improves educational adaptation",
+          "target_key": "earth_systems::earth-cycle adaptive model",
+          "weight": 1.0
+        }
+      ],
+      "student_id": "earth-cycle-student-01",
+      "timestamp": 1786248898.670967
+    },
+    {
+      "discipline": "earth_systems",
+      "knowledge_items": [
+        {
+          "content": "learning ecologies raise scientific retention",
+          "knowledge_type": "scientific_findings"
+        },
+        {
+          "content": "planetary adaptive model",
+          "knowledge_type": "models"
+        },
+        {
+          "content": "feedback loops improve curriculum continuity",
+          "knowledge_type": "lessons_learned"
+        },
+        {
+          "content": "distributed solar labs increase infrastructure uptime",
+          "knowledge_type": "engineering_knowledge"
+        },
+        {
+          "content": "skills compounding improves regional productivity",
+          "knowledge_type": "economic_knowledge"
+        },
+        {
+          "content": "local climate observatories accelerate adaptation",
+          "knowledge_type": "climate_knowledge"
+        }
+      ],
+      "researcher": "gaia",
+      "scientific_graph_nodes": {
+        "climate_knowledge": "earth_systems::local climate observatories accelerate adaptation",
+        "economic_knowledge": "earth_systems::skills compounding improves regional productivity",
+        "engineering_knowledge": "earth_systems::distributed solar labs increase infrastructure uptime",
+        "lessons_learned": "earth_systems::feedback loops improve curriculum continuity",
+        "models": "earth_systems::planetary adaptive model",
+        "scientific_findings": "earth_systems::learning ecologies raise scientific retention"
+      },
+      "scientific_graph_relations": [
+        {
+          "relation_type": "validated_by",
+          "source_key": "earth_systems::learning ecologies raise scientific retention",
+          "target_key": "earth_systems::planetary adaptive model",
+          "weight": 1.0
+        },
+        {
+          "relation_type": "implemented_by",
+          "source_key": "earth_systems::planetary adaptive model",
+          "target_key": "earth_systems::distributed solar labs increase infrastructure uptime",
+          "weight": 1.0
+        },
+        {
+          "relation_type": "mitigates",
+          "source_key": "earth_systems::distributed solar labs increase infrastructure uptime",
+          "target_key": "earth_systems::local climate observatories accelerate adaptation",
+          "weight": 1.0
+        },
+        {
+          "relation_type": "funds",
+          "source_key": "earth_systems::skills compounding improves regional productivity",
+          "target_key": "earth_systems::local climate observatories accelerate adaptation",
+          "weight": 1.0
+        },
+        {
+          "relation_type": "improves",
+          "source_key": "earth_systems::feedback loops improve curriculum continuity",
+          "target_key": "earth_systems::planetary adaptive model",
+          "weight": 1.0
+        }
+      ],
+      "student_id": "earth-student-01",
+      "timestamp": 1786248899.4245918
+    },
+    {
+      "discipline": "earth_systems",
+      "knowledge_items": [
+        {
+          "content": "systems learning increases retention",
+          "knowledge_type": "scientific_findings"
+        },
+        {
+          "content": "earth adaptive model",
+          "knowledge_type": "models"
+        },
+        {
+          "content": "feedback shortens adaptation cycles",
+          "knowledge_type": "lessons_learned"
+        },
+        {
+          "content": "solar labs strengthen local resilience",
+          "knowledge_type": "engineering_knowledge"
+        },
+        {
+          "content": "skills mobility expands local productivity",
+          "knowledge_type": "economic_knowledge"
+        },
+        {
+          "content": "community observatories improve adaptation readiness",
+          "knowledge_type": "climate_knowledge"
+        }
+      ],
+      "researcher": "gaia",
+      "scientific_graph_nodes": {
+        "climate_knowledge": "earth_systems::community observatories improve adaptation readiness",
+        "economic_knowledge": "earth_systems::skills mobility expands local productivity",
+        "engineering_knowledge": "earth_systems::solar labs strengthen local resilience",
+        "lessons_learned": "earth_systems::feedback shortens adaptation cycles",
+        "models": "earth_systems::earth adaptive model",
+        "scientific_findings": "earth_systems::systems learning increases retention"
+      },
+      "scientific_graph_relations": [
+        {
+          "relation_type": "validated_by",
+          "source_key": "earth_systems::systems learning increases retention",
+          "target_key": "earth_systems::earth adaptive model",
+          "weight": 1.0
+        },
+        {
+          "relation_type": "implemented_by",
+          "source_key": "earth_systems::earth adaptive model",
+          "target_key": "earth_systems::solar labs strengthen local resilience",
+          "weight": 1.0
+        },
+        {
+          "relation_type": "mitigates",
+          "source_key": "earth_systems::solar labs strengthen local resilience",
+          "target_key": "earth_systems::community observatories improve adaptation readiness",
+          "weight": 1.0
+        },
+        {
+          "relation_type": "funds",
+          "source_key": "earth_systems::skills mobility expands local productivity",
+          "target_key": "earth_systems::community observatories improve adaptation readiness",
+          "weight": 1.0
+        },
+        {
+          "relation_type": "improves",
+          "source_key": "earth_systems::feedback shortens adaptation cycles",
+          "target_key": "earth_systems::earth adaptive model",
+          "weight": 1.0
+        }
+      ],
+      "student_id": "earth-student-http",
+      "timestamp": 1786248920.6761332
+    },
+    {
+      "discipline": "earth_systems",
+      "knowledge_items": [
+        {
+          "content": "planetary loops increase long-term retention",
+          "knowledge_type": "scientific_findings"
+        },
+        {
+          "content": "earth-cycle adaptive model",
+          "knowledge_type": "models"
+        },
+        {
+          "content": "continuous observability improves educational adaptation",
+          "knowledge_type": "lessons_learned"
+        },
+        {
+          "content": "distributed energy labs increase school uptime",
+          "knowledge_type": "engineering_knowledge"
+        },
+        {
+          "content": "skills stackability accelerates regional development",
+          "knowledge_type": "economic_knowledge"
+        },
+        {
+          "content": "local climate sensing improves adaptation execution",
+          "knowledge_type": "climate_knowledge"
+        }
+      ],
+      "researcher": "gaia-cycle",
+      "scientific_graph_nodes": {
+        "climate_knowledge": "earth_systems::local climate sensing improves adaptation execution",
+        "economic_knowledge": "earth_systems::skills stackability accelerates regional development",
+        "engineering_knowledge": "earth_systems::distributed energy labs increase school uptime",
+        "lessons_learned": "earth_systems::continuous observability improves educational adaptation",
+        "models": "earth_systems::earth-cycle adaptive model",
+        "scientific_findings": "earth_systems::planetary loops increase long-term retention"
+      },
+      "scientific_graph_relations": [
+        {
+          "relation_type": "validated_by",
+          "source_key": "earth_systems::planetary loops increase long-term retention",
+          "target_key": "earth_systems::earth-cycle adaptive model",
+          "weight": 1.0
+        },
+        {
+          "relation_type": "implemented_by",
+          "source_key": "earth_systems::earth-cycle adaptive model",
+          "target_key": "earth_systems::distributed energy labs increase school uptime",
+          "weight": 1.0
+        },
+        {
+          "relation_type": "mitigates",
+          "source_key": "earth_systems::distributed energy labs increase school uptime",
+          "target_key": "earth_systems::local climate sensing improves adaptation execution",
+          "weight": 1.0
+        },
+        {
+          "relation_type": "funds",
+          "source_key": "earth_systems::skills stackability accelerates regional development",
+          "target_key": "earth_systems::local climate sensing improves adaptation execution",
+          "weight": 1.0
+        },
+        {
+          "relation_type": "improves",
+          "source_key": "earth_systems::continuous observability improves educational adaptation",
+          "target_key": "earth_systems::earth-cycle adaptive model",
+          "weight": 1.0
+        }
+      ],
+      "student_id": "earth-cycle-student-01",
+      "timestamp": 1786248978.932015
+    },
+    {
+      "discipline": "earth_systems",
+      "knowledge_items": [
+        {
+          "content": "learning ecologies raise scientific retention",
+          "knowledge_type": "scientific_findings"
+        },
+        {
+          "content": "planetary adaptive model",
+          "knowledge_type": "models"
+        },
+        {
+          "content": "feedback loops improve curriculum continuity",
+          "knowledge_type": "lessons_learned"
+        },
+        {
+          "content": "distributed solar labs increase infrastructure uptime",
+          "knowledge_type": "engineering_knowledge"
+        },
+        {
+          "content": "skills compounding improves regional productivity",
+          "knowledge_type": "economic_knowledge"
+        },
+        {
+          "content": "local climate observatories accelerate adaptation",
+          "knowledge_type": "climate_knowledge"
+        }
+      ],
+      "memory_mesh_capture": {
+        "knowledge_capture_count": 6,
+        "knowledge_capture_types": [
+          "scientific_findings",
+          "models",
+          "lessons_learned",
+          "engineering_knowledge",
+          "economic_knowledge",
+          "climate_knowledge"
+        ]
+      },
+      "researcher": "gaia",
+      "scientific_graph_nodes": {
+        "climate_knowledge": "earth_systems::local climate observatories accelerate adaptation",
+        "economic_knowledge": "earth_systems::skills compounding improves regional productivity",
+        "engineering_knowledge": "earth_systems::distributed solar labs increase infrastructure uptime",
+        "lessons_learned": "earth_systems::feedback loops improve curriculum continuity",
+        "models": "earth_systems::planetary adaptive model",
+        "scientific_findings": "earth_systems::learning ecologies raise scientific retention"
+      },
+      "scientific_graph_relations": [
+        {
+          "relation_type": "validated_by",
+          "source_key": "earth_systems::learning ecologies raise scientific retention",
+          "target_key": "earth_systems::planetary adaptive model",
+          "weight": 1.0
+        },
+        {
+          "relation_type": "implemented_by",
+          "source_key": "earth_systems::planetary adaptive model",
+          "target_key": "earth_systems::distributed solar labs increase infrastructure uptime",
+          "weight": 1.0
+        },
+        {
+          "relation_type": "mitigates",
+          "source_key": "earth_systems::distributed solar labs increase infrastructure uptime",
+          "target_key": "earth_systems::local climate observatories accelerate adaptation",
+          "weight": 1.0
+        },
+        {
+          "relation_type": "funds",
+          "source_key": "earth_systems::skills compounding improves regional productivity",
+          "target_key": "earth_systems::local climate observatories accelerate adaptation",
+          "weight": 1.0
+        },
+        {
+          "relation_type": "improves",
+          "source_key": "earth_systems::feedback loops improve curriculum continuity",
+          "target_key": "earth_systems::planetary adaptive model",
+          "weight": 1.0
+        }
+      ],
+      "student_id": "earth-student-01",
+      "timestamp": 1786303551.2746763
+    }
+  ],
+  "runtime": "earth_knowledge_runtime"
+}
