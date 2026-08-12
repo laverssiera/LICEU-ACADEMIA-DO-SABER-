@@ -39,6 +39,26 @@ from runtime.education.observability.learning_metrics_runtime import LearningMet
 from runtime.education.observability.sovereign_education_monitor import SovereignEducationMonitor
 from runtime.identity_runtime import generate_learning_identity
 
+try:
+    from continental_knowledge_runtime import run_runtime as continental_knowledge_run_runtime
+except ImportError:  # pragma: no cover - workload fallback when runtime module is not on PYTHONPATH
+    continental_knowledge_run_runtime = None
+
+try:
+    from continental_learning_runtime import run_runtime as continental_learning_run_runtime
+except ImportError:  # pragma: no cover - workload fallback when runtime module is not on PYTHONPATH
+    continental_learning_run_runtime = None
+
+try:
+    from continental_scientific_graph_runtime import run_runtime as continental_scientific_graph_run_runtime
+except ImportError:  # pragma: no cover - workload fallback when runtime module is not on PYTHONPATH
+    continental_scientific_graph_run_runtime = None
+
+try:
+    from scientific_memory_runtime import run_runtime as institutional_memory_run_runtime
+except ImportError:  # pragma: no cover - workload fallback when runtime module is not on PYTHONPATH
+    institutional_memory_run_runtime = None
+
 
 APP_INSTRUMENTED = False
 
@@ -400,6 +420,35 @@ async def metrics_middleware(request: Request, call_next):
 @app.get("/health")
 async def health():
     return {"status": "healthy", "runtime": "academia-do-saber"}
+
+
+@app.get("/academy/continental/summary", tags=["Continental Institutional Memory"])
+async def continental_summary(
+    _: dict[str, Any] = Depends(require_roles("education.runtime.read")),
+):
+    from runtime.education.educational_memory_mesh import EducationalMemoryMesh, ScientificKnowledgeGraph
+
+    runtime_status = {
+        "knowledge": continental_knowledge_run_runtime is not None,
+        "learning": continental_learning_run_runtime is not None,
+        "scientific_graph": continental_scientific_graph_run_runtime is not None,
+        "institutional_memory": institutional_memory_run_runtime is not None,
+    }
+
+    return {
+        "runtime_identity": "Continental Institutional Memory",
+        "runtimes": list(runtime_status.keys()),
+        "runtime_status": runtime_status,
+        "institutional_memory_status": "ready" if all(runtime_status.values()) else "partial",
+        "summary": {
+            "knowledge_graph": "available" if runtime_status["knowledge"] else "unavailable",
+            "learning_flow": "available" if runtime_status["learning"] else "unavailable",
+            "scientific_graph": "available" if runtime_status["scientific_graph"] else "unavailable",
+            "institutional_memory": "available" if runtime_status["institutional_memory"] else "unavailable",
+        },
+        "memory_mesh": EducationalMemoryMesh.mesh_snapshot(limit=1),
+        "scientific_knowledge_graph": ScientificKnowledgeGraph.graph_snapshot(limit=1),
+    }
 
 
 @app.get("/education/runtime-status")

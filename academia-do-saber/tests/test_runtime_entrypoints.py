@@ -223,6 +223,97 @@ def test_earth_knowledge_runtime_persists_and_integrates_all_knowledge_types():
     assert ledger["ledger_path"].endswith("runtime/storage/earth_knowledge_ledger.json")
 
 
+def test_continental_knowledge_runtime_persists_institutional_memory():
+    payload = _run_script(
+        "continental_knowledge_runtime.py",
+        "--continent",
+        "south-america",
+        "--student-id",
+        "continental-student-01",
+        "--researcher",
+        "institucional-matrix",
+        "--discipline",
+        "educational_policy",
+        "--scientific-finding",
+        "institutional memory improves long-term governance continuity",
+        "--model",
+        "continental adaptive learning model",
+        "--lesson-learned",
+        "cross-border memory stabilizes curriculum adoption",
+        "--engineering-knowledge",
+        "shared lab networks improve regional teaching infrastructure",
+        "--economic-knowledge",
+        "institutional memory accelerates public investment in skills",
+        "--climate-knowledge",
+        "community climate intelligence strengthens adaptation policy",
+    )
+
+    assert payload["continental_runtime_state"] == "continental_knowledge_runtime_operational"
+    assert payload["knowledge_registry"]["registered_types"] == [
+        "scientific_findings",
+        "models",
+        "lessons_learned",
+        "engineering_knowledge",
+        "economic_knowledge",
+        "climate_knowledge",
+    ]
+    assert payload["integrations"]["memory_mesh"]["runtime_state"] == "educational_memory_mesh_operational"
+    assert payload["integrations"]["scientific_graph"]["runtime_state"] == "scientific_knowledge_graph_operational"
+    assert payload["integrations"]["knowledge_graph"]["runtime_identity"] == "Knowledge Graph"
+
+
+def test_continental_learning_runtime_uses_continental_graph_and_memory_stack():
+    payload = _run_script(
+        "continental_learning_runtime.py",
+        "--continent",
+        "europe",
+        "--student-id",
+        "continental-student-02",
+        "--researcher",
+        "eu-matrix",
+        "--discipline",
+        "higher_education",
+        "--event",
+        "institutional memory event detected across continental networks",
+        "--knowledge",
+        "distributed institutional memory accelerates curriculum continuity",
+        "--relation",
+        "knowledge retention relates to governance confidence",
+        "--causality",
+        "governance confidence causes adaptive institutional resilience",
+        "--learning",
+        "continental learning loops increase retention and policy coherence",
+        "--future-decision",
+        "scale institutional memory across every regional learning network",
+    )
+
+    assert payload["continental_learning_runtime_state"] == "continental_learning_runtime_operational"
+    assert payload["integrations"]["continental_knowledge"]["continental_runtime_state"] == "continental_knowledge_runtime_operational"
+    assert payload["integrations"]["continental_graph"]["graph"]["edges_created"] >= 1
+    assert payload["integrations"]["continental_training"]["knowledge_graph"]["runtime_state"] == "scientific_knowledge_graph_operational"
+    assert payload["decision"]["decision_confidence"] >= 0.0
+
+
+def test_continental_summary_endpoint_returns_integrated_institutional_memory():
+    with TestClient(main.app) as client:
+        token = _get_token(client, role="admin")
+        response = client.get(
+            "/academy/continental/summary",
+            headers={
+                "Authorization": f"Bearer {token}",
+                "x-holding-user-id": "HLD-001",
+            },
+        )
+
+    assert response.status_code == 200
+    body = response.json()
+    assert body["runtime_identity"] == "Continental Institutional Memory"
+    assert set(body["runtimes"]) == {"knowledge", "learning", "scientific_graph", "institutional_memory"}
+    assert body["institutional_memory_status"] in {"ready", "partial"}
+    assert "memory_mesh" in body
+    assert "scientific_knowledge_graph" in body
+
+
 def test_local_http_flow_works_with_optional_federation(monkeypatch):
     async def fail_connect():
         raise RuntimeError("nats offline")
