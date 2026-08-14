@@ -647,3 +647,117 @@ formar pessoas capazes de resolver problemas reais,
 reduzir sofrimento humano,
 expandir acesso a infraestrutura,
 e construir uma sociedade mais digna, resiliente e evolutiva para todas as pessoas.
+
+## Educational Autonomic Runtime - Operacao
+
+Os runtimes abaixo estao integrados no FastAPI da Academia:
+
+- educational_autonomic_runtime
+- educational_memory_mesh
+- pedagogical_reasoning_runtime
+- civilization_education_sync
+- federated_learning_identity
+
+Se estiver executando localmente via uvicorn padrao, use `http://localhost:8000`.
+Se estiver executando via entrypoint federado, ajuste para a porta definida por `ACADEMIA_RUNTIME_PORT` (padrao 8910).
+
+Para validar todos os endpoints em sequencia com resumo automatico:
+
+```bash
+BASE_URL=http://localhost:8000 ./scripts/smoke-educational-autonomic-runtime.sh
+```
+
+### 1) Educational Autonomic Runtime
+
+```bash
+curl -X POST http://localhost:8000/education/autonomic/evaluate \
+	-H "Content-Type: application/json" \
+	-d '{
+		"student_id":"student-001",
+		"discipline":"physics",
+		"cognition_score":0.82,
+		"consistency":0.74,
+		"engagement":0.91
+	}'
+```
+
+```bash
+curl "http://localhost:8000/education/autonomic/history?limit=20"
+```
+
+### 2) Educational Memory Mesh
+
+```bash
+curl -X POST http://localhost:8000/education/memory-mesh/upsert \
+	-H "Content-Type: application/json" \
+	-d '{
+		"student_id":"student-002",
+		"discipline":"chemistry",
+		"cognition_score":0.65,
+		"consistency":0.55,
+		"engagement":0.62
+	}'
+```
+
+```bash
+curl "http://localhost:8000/education/memory-mesh/student/student-002?limit=20"
+```
+
+```bash
+curl "http://localhost:8000/education/memory-mesh/snapshot?limit=20"
+```
+
+### 3) Pedagogical Reasoning Runtime
+
+```bash
+curl -X POST http://localhost:8000/education/pedagogical-reasoning/reason \
+	-H "Content-Type: application/json" \
+	-d '{
+		"student_id":"student-003",
+		"discipline":"mathematics",
+		"cognition_score":0.48,
+		"consistency":0.52,
+		"engagement":0.50
+	}'
+```
+
+```bash
+curl "http://localhost:8000/education/pedagogical-reasoning/history?limit=20"
+```
+
+### 4) Civilization Education Sync
+
+```bash
+curl -X POST http://localhost:8000/education/civilization-sync/synchronize \
+	-H "Content-Type: application/json" \
+	-d '{
+		"federation_id":"federation-01",
+		"region":"americas",
+		"cognition_sync":0.83,
+		"curriculum_sync":0.78,
+		"intervention_sync":0.81
+	}'
+```
+
+```bash
+curl "http://localhost:8000/education/civilization-sync/history?limit=20"
+```
+
+### 5) Federated Learning Identity
+
+```bash
+curl -X POST http://localhost:8000/education/federated-identity/generate \
+	-H "Content-Type: application/json" \
+	-d '{
+		"student_id":"student-004",
+		"ecosystem":"academy",
+		"discipline":"biology",
+		"cognition_score":0.79,
+		"consistency":0.73,
+		"engagement":0.76
+	}'
+```
+
+```bash
+curl "http://localhost:8000/education/federated-identity/history?limit=20"
+```

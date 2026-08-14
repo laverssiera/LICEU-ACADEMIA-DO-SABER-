@@ -1,0 +1,79 @@
+{
+  "service": "liceu-academy-api",
+  "version": "7.0",
+  "schemas": {
+    "registerRequest": {
+      "$ref": "#/definitions/RegisterRequest",
+      "definitions": {
+        "RegisterRequest": {
+          "type": "object",
+          "properties": {
+            "email": {
+              "type": "string",
+              "minLength": 1,
+              "format": "email"
+            },
+            "password": {
+              "type": "string",
+              "minLength": 8
+            }
+          },
+          "required": [
+            "email",
+            "password"
+          ],
+          "additionalProperties": false
+        }
+      },
+      "$schema": "http://json-schema.org/draft-07/schema#"
+    },
+    "enrollRequest": {
+      "$ref": "#/definitions/EnrollRequest",
+      "definitions": {
+        "EnrollRequest": {
+          "type": "object",
+          "properties": {
+            "course_id": {
+              "type": "string",
+              "minLength": 1,
+              "pattern": "^course-[a-zA-Z0-9_-]+$"
+            }
+          },
+          "required": [
+            "course_id"
+          ],
+          "additionalProperties": false
+        }
+      },
+      "$schema": "http://json-schema.org/draft-07/schema#"
+    }
+  },
+  "endpoints": [
+    {
+      "method": "POST",
+      "path": "/auth/register",
+      "requestSchema": "RegisterRequest",
+      "responses": {
+        "200": {
+          "description": "User registered"
+        },
+        "400": {
+          "description": "Validation error"
+        }
+      }
+    },
+    {
+      "method": "POST",
+      "path": "/academy/enroll",
+      "requestSchema": "EnrollRequest",
+      "responses": {
+        "200": {
+          "description": "Enrollment confirmed"
+        },
+        "400": {
+          "description": "Validation error"
+        }
+      }
+    }
+  ]
+}

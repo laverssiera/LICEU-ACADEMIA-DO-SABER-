@@ -1,0 +1,11 @@
+{
+  "name": "@liceu/game-engine",
+  "version": "7.0.0",
+  "private": true,
+  "scripts": {
+    "dev": "echo 'game-engine dev placeholder'",
+    "build": "echo 'game-engine build placeholder'",
+    "test": "node --test",
+    "lint": "eslint --no-error-on-unmatched-pattern '*.js'"
+  }
+}

@@ -1,0 +1,43 @@
+groups:
+  - name: civilization-education-alerts
+    interval: 30s
+    rules:
+      - alert: CivilizationEducationSyncFailuresHigh
+        expr: increase(civilization_education_brain_sync_total{status="failure"}[10m]) > 0
+        for: 5m
+        labels:
+          severity: warning
+          domain: education
+        annotations:
+          summary: "Falhas de sincronizacao entre Academia e Civilization Brain"
+          description: "Foi detectada ao menos uma falha de sync nos ultimos 10 minutos."
+
+      - alert: CivilizationEducationSyncStale
+        expr: (time() - civilization_education_last_sync_timestamp_seconds) > 180
+        for: 2m
+        labels:
+          severity: critical
+          domain: education
+        annotations:
+          summary: "Sync educacional desatualizado"
+          description: "O ultimo sync civilizacional ultrapassou 180 segundos."
+
+      - alert: CivilizationEducationGlobalIntelligenceLow
+        expr: civilization_education_global_intelligence_score < 0.75
+        for: 10m
+        labels:
+          severity: warning
+          domain: education
+        annotations:
+          summary: "Score global de inteligencia educacional baixo"
+          description: "O score global permaneceu abaixo de 0.75 por 10 minutos."
+
+      - alert: CivilizationEducationSignalsFlatline
+        expr: rate(civilization_education_signals_published_total[10m]) == 0 and civilization_education_global_events > 0
+        for: 10m
+        labels:
+          severity: warning
+          domain: education
+        annotations:
+          summary: "Propagacao de sinais educacionais interrompida"
+          description: "Nao houve publicacao de sinais nos ultimos 10 minutos mesmo com eventos globais presentes."

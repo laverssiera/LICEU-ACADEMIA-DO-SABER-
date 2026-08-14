@@ -1,0 +1,62 @@
+services:
+  alertmanager:
+    image: prom/alertmanager
+    command:
+      - "--config.file=/etc/alertmanager/alertmanager.yml"
+      - "--config.expand-env"
+    environment:
+      - ALERTMANAGER_WEBHOOK_URL=${ALERTMANAGER_WEBHOOK_URL:-http://host.docker.internal:19093/alerts}
+      - ALERTMANAGER_SLACK_WEBHOOK_URL=${ALERTMANAGER_SLACK_WEBHOOK_URL:-http://host.docker.internal:19094/slack}
+      - ALERTMANAGER_SLACK_CHANNEL_CRITICAL=${ALERTMANAGER_SLACK_CHANNEL_CRITICAL:-#civilization-critical}
+      - ALERTMANAGER_SLACK_CHANNEL_WARNING=${ALERTMANAGER_SLACK_CHANNEL_WARNING:-#civilization-warning}
+    volumes:
+      - ../infra/monitoring/alertmanager:/etc/alertmanager:ro
+    ports:
+      - "9093:9093"
+
+  prometheus:
+    image: prom/prometheus
+    depends_on:
+      - alertmanager
+    command:
+      - "--config.file=/etc/prometheus/prometheus.yml"
+      - "--storage.tsdb.path=/prometheus"
+      - "--web.enable-lifecycle"
+    volumes:
+      - ../infra/monitoring/prometheus:/etc/prometheus:ro
+    ports:
+      - "9090:9090"
+
+  grafana:
+    image: grafana/grafana
+    depends_on:
+      - prometheus
+    volumes:
+      - ../infra/monitoring/grafana/provisioning:/etc/grafana/provisioning:ro
+      - ../infra/monitoring/grafana/dashboards:/var/lib/grafana/dashboards/civilization:ro
+    ports:
+      - "3005:3000"
+
+  tempo:
+    image: grafana/tempo
+    ports:
+      - "3200:3200"
+
+  loki:
+    image: grafana/loki
+    ports:
+      - "3100:3100"
+
+  jaeger:
+    image: jaegertracing/all-in-one
+    ports:
+      - "16686:16686"
+
+  neo4j:
+    image: neo4j:5
+    environment:
+      - NEO4J_AUTH=neo4j/liceu
+      - NEO4J_dbms_security_auth__minimum__password__length=5
+    ports:
+      - "7474:7474"
+      - "7687:7687"

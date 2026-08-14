@@ -1,0 +1,10 @@
+{
+  "name": "@liceu/nats",
+  "version": "7.0.0",
+  "private": true,
+  "type": "module",
+  "main": "events.ts",
+  "dependencies": {
+    "nats": "^2.29.3"
+  }
+}

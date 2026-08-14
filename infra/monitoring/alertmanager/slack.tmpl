@@ -1,0 +1,14 @@
+{{ define "liceu.slack.title" -}}
+[LICEU] {{ .CommonLabels.severity | toUpper }} - {{ .CommonLabels.alertname }}
+{{- end }}
+
+{{ define "liceu.slack.text" -}}
+*Status:* {{ .Status }}
+*Dominio:* {{ .CommonLabels.domain }}
+*Severidade:* {{ .CommonLabels.severity }}
+*Alertas:* {{ len .Alerts }}
+{{ range .Alerts }}
+- {{ .Annotations.summary }}
+  {{ .Annotations.description }}
+{{ end }}
+{{- end }}
