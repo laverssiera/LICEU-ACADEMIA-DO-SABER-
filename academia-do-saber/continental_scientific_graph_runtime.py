@@ -81,6 +81,23 @@ def run_runtime(payload: dict[str, Any]) -> dict[str, Any]:
 
     _load_dotenv()
 
+    payload = dict(payload)
+    payload.setdefault("continent", os.getenv("CONTINENT_GRAPH_NAME", "south-america"))
+    payload.setdefault("discipline", os.getenv("CONTINENT_GRAPH_DISCIPLINE", "educational_policy"))
+    payload.setdefault("source", os.getenv("CONTINENT_GRAPH_SOURCE", "continental_scientific_graph_runtime"))
+    payload.setdefault("confidence", float(os.getenv("CONTINENT_GRAPH_CONFIDENCE", "0.92")))
+    payload.setdefault("event", os.getenv("CONTINENT_EVENT", "institutional memory event detected across continental networks"))
+    payload.setdefault("knowledge", os.getenv("CONTINENT_KNOWLEDGE", "distributed institutional memory accelerates curriculum continuity"))
+    payload.setdefault("relation", os.getenv("CONTINENT_RELATION", "knowledge retention relates to governance confidence"))
+    payload.setdefault("causality", os.getenv("CONTINENT_CAUSALITY", "governance confidence causes adaptive institutional resilience"))
+    payload.setdefault("cause", os.getenv("CONTINENT_MEMORY_CAUSE", "institutional memory reveals a governance inflection"))
+    payload.setdefault("decision", os.getenv("CONTINENT_MEMORY_DECISION", "adopt evidence-informed educational governance"))
+    payload.setdefault("execution", os.getenv("CONTINENT_MEMORY_EXECUTION", "coordinate the decision across learning networks"))
+    payload.setdefault("impact", os.getenv("CONTINENT_MEMORY_IMPACT", "curriculum continuity and governance confidence improve"))
+    payload.setdefault("mitigation", os.getenv("CONTINENT_MEMORY_MITIGATION", "close knowledge gaps through shared institutional practice"))
+    payload.setdefault("result", os.getenv("CONTINENT_MEMORY_RESULT", "the intervention stabilizes adaptive institutional resilience"))
+    payload.setdefault("lesson_learned", os.getenv("CONTINENT_MEMORY_LESSON_LEARNED", "traceable decisions turn experience into reusable institutional knowledge"))
+
     from runtime.education.educational_memory_mesh import ScientificKnowledgeGraph
 
     now = time.time()

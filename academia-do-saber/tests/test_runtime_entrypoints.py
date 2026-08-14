@@ -155,6 +155,25 @@ def test_continental_scientific_graph_registers_institutional_memory_chain():
     assert memory["edges_created"] == 7
 
 
+def test_continental_scientific_graph_runtime_uses_defaults_for_institutional_memory_chain():
+    payload = {
+        "continent": "south-america",
+        "discipline": "educational_policy",
+        "source": "partial_payload_test",
+        "confidence": 0.91,
+        "event": "institutional memory event detected across continental networks",
+        "knowledge": "distributed institutional memory accelerates curriculum continuity",
+        "relation": "knowledge retention relates to governance confidence",
+        "causality": "governance confidence causes adaptive institutional resilience",
+    }
+
+    result = main.continental_scientific_graph_run_runtime(payload)
+
+    assert result["continental_scientific_graph_runtime_state"] == "operational"
+    assert result["institutional_memory"]["nodes_registered"] == 8
+    assert result["institutional_memory"]["edges_created"] == 7
+
+
 def test_research_lineage_runtime_accepts_cli_flag():
     payload = _run_script(
         "research_lineage_runtime.py",
