@@ -1,0 +1,14 @@
+{
+  "version": "1.1.0",
+  "permissions": {
+    "courses.create": ["admin", "operator", "professor"],
+    "certifications.issue": ["admin", "certifier", "professor"],
+    "knowledge.register": ["admin", "researcher", "professor"],
+    "collective.synchronize": ["admin", "operator"],
+    "holographic.rooms.create": ["admin", "operator", "professor"],
+    "interplanetary.curriculum": ["admin", "researcher", "professor"],
+    "agents.john.mentor": ["admin", "operator", "professor"],
+    "admin.rbac.status": ["admin"],
+    "admin.rbac.reload": ["admin"]
+  }
+}

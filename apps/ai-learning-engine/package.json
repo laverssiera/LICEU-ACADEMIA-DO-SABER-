@@ -1,0 +1,11 @@
+{
+  "name": "@liceu/ai-learning-engine",
+  "version": "7.0.0",
+  "private": true,
+  "scripts": {
+    "dev": ".venv/bin/uvicorn main:app --host 0.0.0.0 --port 8110 --reload",
+    "build": "python -m py_compile main.py",
+    "test": ".venv/bin/pytest -q; code=$?; [ $code -eq 0 ] || [ $code -eq 5 ]",
+    "lint": ".venv/bin/ruff check ."
+  }
+}

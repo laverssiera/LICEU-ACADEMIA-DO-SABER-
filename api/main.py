@@ -9,10 +9,28 @@ import asyncio
 import json
 import math
 import random
+import sys
 import uuid
 from datetime import datetime
 from functools import wraps
+from pathlib import Path
 from typing import Any
+
+
+PROJECT_ROOT = Path(__file__).resolve().parent.parent / "academia-do-saber"
+if str(PROJECT_ROOT) not in sys.path:
+    sys.path.insert(0, str(PROJECT_ROOT))
+
+try:
+    from continental_knowledge_runtime import run_runtime as continental_knowledge_run_runtime
+    from continental_learning_runtime import run_runtime as continental_learning_run_runtime
+    from continental_scientific_graph_runtime import run_runtime as continental_scientific_graph_run_runtime
+    from continental_training_runtime import run_runtime as continental_training_run_runtime
+except ImportError:  # pragma: no cover - compatibility mode for environments without the runtime package
+    continental_knowledge_run_runtime = None
+    continental_learning_run_runtime = None
+    continental_scientific_graph_run_runtime = None
+    continental_training_run_runtime = None
 
 from fastapi import Depends, FastAPI, HTTPException, Query, Request, WebSocket, WebSocketDisconnect
 from fastapi.middleware.cors import CORSMiddleware
@@ -487,6 +505,63 @@ class CorporateUniversityCreateRequest(BaseModel):
     tracks: list[str] = []
     use_john: bool = True
     use_cefeida: bool = True
+
+
+class ContinentalKnowledgeRequest(BaseModel):
+    continent: str = "south-america"
+    student_id: str = "continental-student"
+    researcher: str = "continental-researcher"
+    discipline: str = "educational_policy"
+    certification: str = "continental_runtime_mastery"
+    cognition_score: float = 0.92
+    consistency: float = 0.89
+    engagement: float = 0.94
+    scientific_finding: str | None = None
+    model: str | None = None
+    lesson_learned: str | None = None
+    engineering_knowledge: str | None = None
+    economic_knowledge: str | None = None
+    climate_knowledge: str | None = None
+
+
+class ContinentalLearningRequest(BaseModel):
+    continent: str = "south-america"
+    student_id: str = "continental-student"
+    researcher: str = "continental-researcher"
+    discipline: str = "educational_policy"
+    certification: str = "continental_runtime_mastery"
+    confidence: float = 0.92
+    cognition_score: float = 0.91
+    consistency: float = 0.87
+    engagement: float = 0.94
+    event: str | None = None
+    knowledge: str | None = None
+    relation: str | None = None
+    causality: str | None = None
+    learning: str | None = None
+    future_decision: str | None = None
+
+
+class ContinentalGraphRequest(BaseModel):
+    continent: str = "south-america"
+    discipline: str = "educational_policy"
+    source: str = "api_continental_graph_runtime"
+    confidence: float = 0.92
+    event: str | None = None
+    knowledge: str | None = None
+    relation: str | None = None
+    causality: str | None = None
+
+
+class ContinentalTrainingRequest(BaseModel):
+    continent: str = "south-america"
+    student_id: str = "continental-student"
+    researcher: str = "continental-researcher"
+    discipline: str = "educational_policy"
+    cognition_score: float = 0.91
+    consistency: float = 0.88
+    engagement: float = 0.93
+    track: str = "institutional-memory"
 
 
 # ──────────────────────────────────────────────────────────────────────────────
@@ -1364,4 +1439,74 @@ async def start_feedback_loop(body: FeedbackLoopRequest, _user=require_permissio
 async def list_feedback_loops(user_id: str, _user=require_permission("courses", "read")):
     """Retorna todos os ciclos de feedback de um usuário."""
     return [l for l in feedback_loops_db if l["user_id"] == user_id]
+
+
+# ──────────────────────────────────────────────────────────────────────────────
+# Continental Institutional Memory
+# ──────────────────────────────────────────────────────────────────────────────
+@app.post("/academy/continental/knowledge", tags=["Continental Institutional Memory"])
+async def continental_knowledge_runtime_endpoint(body: ContinentalKnowledgeRequest, _user=require_permission("courses", "read")):
+    if continental_knowledge_run_runtime is None:
+        raise HTTPException(503, "Runtimes continentais não disponíveis no backend atual.")
+
+    payload = body.model_dump()
+    payload.setdefault("scientific_finding", "institutional memory stabilizes resilient educational governance")
+    payload.setdefault("model", "continental adaptive learning model with resilient memory loops")
+    payload.setdefault("lesson_learned", "shared memory improves curriculum continuity across regions")
+    payload.setdefault("engineering_knowledge", "distributed regional labs increase school resilience and educational access")
+    payload.setdefault("economic_knowledge", "institutional memory accelerates regional skills investment and labor mobility")
+    payload.setdefault("climate_knowledge", "continental climate intelligence improves adaptation and public planning")
+
+    return continental_knowledge_run_runtime(payload)
+
+
+@app.post("/academy/continental/graph", tags=["Continental Institutional Memory"])
+async def continental_graph_runtime_endpoint(body: ContinentalGraphRequest, _user=require_permission("courses", "read")):
+    if continental_scientific_graph_run_runtime is None:
+        raise HTTPException(503, "Runtime científico continental não disponível no backend atual.")
+
+    payload = body.model_dump()
+    payload.setdefault("event", "institutional memory event detected across continental networks")
+    payload.setdefault("knowledge", "distributed institutional memory accelerates curriculum continuity")
+    payload.setdefault("relation", "knowledge retention relates to governance confidence")
+    payload.setdefault("causality", "governance confidence causes adaptive institutional resilience")
+
+    return continental_scientific_graph_run_runtime(payload)
+
+
+@app.post("/academy/continental/training", tags=["Continental Institutional Memory"])
+async def continental_training_runtime_endpoint(body: ContinentalTrainingRequest, _user=require_permission("courses", "read")):
+    if continental_training_run_runtime is None:
+        raise HTTPException(503, "Runtime de treinamento continental não disponível no backend atual.")
+
+    return continental_training_run_runtime(body.model_dump())
+
+
+@app.post("/academy/continental/learning", tags=["Continental Institutional Memory"])
+async def continental_learning_runtime_endpoint(body: ContinentalLearningRequest, _user=require_permission("courses", "read")):
+    if continental_learning_run_runtime is None:
+        raise HTTPException(503, "Runtime de aprendizado continental não disponível no backend atual.")
+
+    payload = body.model_dump()
+    payload.setdefault("event", "institutional memory event detected across continental networks")
+    payload.setdefault("knowledge", "distributed institutional memory accelerates curriculum continuity")
+    payload.setdefault("relation", "knowledge retention relates to governance confidence")
+    payload.setdefault("causality", "governance confidence causes adaptive institutional resilience")
+    payload.setdefault("learning", "continental learning loops increase retention and policy coherence")
+    payload.setdefault("future_decision", "scale institutional memory across every regional learning network")
+
+    return continental_learning_run_runtime(payload)
+
+
+@app.get("/academy/continental/status", tags=["Continental Institutional Memory"])
+async def continental_status(_user=require_permission("courses", "read")):
+    return {
+        "continental_runtimes_available": {
+            "knowledge": continental_knowledge_run_runtime is not None,
+            "learning": continental_learning_run_runtime is not None,
+            "scientific_graph": continental_scientific_graph_run_runtime is not None,
+            "training": continental_training_run_runtime is not None,
+        },
+        "runtime_identity": "Continental Institutional Memory",
+    }
 

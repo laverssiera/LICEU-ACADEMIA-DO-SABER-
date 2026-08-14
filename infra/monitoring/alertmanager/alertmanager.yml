@@ -1,0 +1,70 @@
+global:
+  resolve_timeout: 5m
+  slack_api_url: ${ALERTMANAGER_SLACK_WEBHOOK_URL}
+
+templates:
+  - /etc/alertmanager/slack.tmpl
+
+route:
+  group_by:
+    - alertname
+    - severity
+    - domain
+  group_wait: 30s
+  group_interval: 5m
+  repeat_interval: 2h
+  receiver: civilization-webhook
+  routes:
+    - matchers:
+        - maintenance="true"
+      receiver: civilization-maintenance-drop
+      continue: false
+    - matchers:
+        - severity="critical"
+      receiver: civilization-slack-critical
+      group_wait: 10s
+      group_interval: 2m
+      repeat_interval: 30m
+      continue: true
+    - matchers:
+        - severity="warning"
+      receiver: civilization-slack-warning
+      group_wait: 1m
+      group_interval: 10m
+      repeat_interval: 2h
+      continue: true
+
+inhibit_rules:
+  - source_matchers:
+      - severity="critical"
+    target_matchers:
+      - severity="warning"
+    equal:
+      - alertname
+      - domain
+
+receivers:
+  - name: civilization-maintenance-drop
+
+  - name: civilization-webhook
+    webhook_configs:
+      - url: ${ALERTMANAGER_WEBHOOK_URL}
+        send_resolved: true
+
+  - name: civilization-slack-critical
+    slack_configs:
+      - channel: ${ALERTMANAGER_SLACK_CHANNEL_CRITICAL}
+        send_resolved: true
+        username: LICEU Alertmanager
+        icon_emoji: ":rotating_light:"
+        title: '{{ template "liceu.slack.title" . }}'
+        text: '{{ template "liceu.slack.text" . }}'
+
+  - name: civilization-slack-warning
+    slack_configs:
+      - channel: ${ALERTMANAGER_SLACK_CHANNEL_WARNING}
+        send_resolved: true
+        username: LICEU Alertmanager
+        icon_emoji: ":warning:"
+        title: '{{ template "liceu.slack.title" . }}'
+        text: '{{ template "liceu.slack.text" . }}'
