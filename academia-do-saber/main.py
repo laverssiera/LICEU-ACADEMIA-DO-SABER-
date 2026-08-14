@@ -19,6 +19,7 @@ from federation.runtime import federation_runtime
 from graph.knowledge_graph import register_knowledge
 from holographic.holographic_classrooms import HolographicClassroomRuntime
 from interplanetary.interplanetary_runtime import InterplanetaryEducationRuntime
+from earth_knowledge_runtime import run_runtime_async as earth_knowledge_run_runtime
 from observability import otel  # noqa: F401
 from opentelemetry.instrumentation.fastapi import FastAPIInstrumentor
 from runtime.collective_learning import CollectiveLearningRuntime
@@ -32,6 +33,11 @@ from runtime.education.governance.cognition_ethics_runtime import CognitionEthic
 from runtime.education.governance.educational_policy_runtime import EducationalPolicyRuntime
 from runtime.education.governance.knowledge_integrity_engine import KnowledgeIntegrityEngine
 from runtime.education.governance.sovereign_learning_governance import SovereignLearningGovernance
+from runtime.education.educational_autonomic_runtime import router as educational_autonomic_router
+from runtime.education.educational_memory_mesh import router as educational_memory_mesh_router
+from runtime.education.pedagogical_reasoning_runtime import router as pedagogical_reasoning_router
+from runtime.education.civilization_education_sync import router as civilization_education_sync_router
+from runtime.education.federated_learning_identity import router as federated_learning_identity_router
 from runtime.education.observability.cognition_trace_runtime import CognitionTraceRuntime
 from runtime.education.observability.educational_telemetry_stream import EducationalTelemetryStream
 from runtime.education.observability.knowledge_lineage_runtime import KnowledgeLineageRuntime
@@ -39,8 +45,29 @@ from runtime.education.observability.learning_metrics_runtime import LearningMet
 from runtime.education.observability.sovereign_education_monitor import SovereignEducationMonitor
 from runtime.identity_runtime import generate_learning_identity
 
+try:
+    from continental_knowledge_runtime import run_runtime as continental_knowledge_run_runtime
+except ImportError:  # pragma: no cover - workload fallback when runtime module is not on PYTHONPATH
+    continental_knowledge_run_runtime = None
+
+try:
+    from continental_learning_runtime import run_runtime as continental_learning_run_runtime
+except ImportError:  # pragma: no cover - workload fallback when runtime module is not on PYTHONPATH
+    continental_learning_run_runtime = None
+
+try:
+    from continental_scientific_graph_runtime import run_runtime as continental_scientific_graph_run_runtime
+except ImportError:  # pragma: no cover - workload fallback when runtime module is not on PYTHONPATH
+    continental_scientific_graph_run_runtime = None
+
+try:
+    from scientific_memory_runtime import run_runtime as institutional_memory_run_runtime
+except ImportError:  # pragma: no cover - workload fallback when runtime module is not on PYTHONPATH
+    institutional_memory_run_runtime = None
+
 
 APP_INSTRUMENTED = False
+FEDERATION_OPTIONAL = os.getenv("FEDERATION_OPTIONAL", "false").lower() == "true"
 
 
 DEFAULT_POLICY: dict[str, list[str]] = {
@@ -50,6 +77,7 @@ DEFAULT_POLICY: dict[str, list[str]] = {
     "collective.synchronize": ["admin", "operator"],
     "holographic.rooms.create": ["admin", "operator", "professor"],
     "interplanetary.curriculum": ["admin", "researcher", "professor"],
+    "earth.knowledge.persist": ["admin", "researcher", "professor"],
     "agents.john.mentor": ["admin", "operator", "professor"],
     "education.runtime.read": ["admin", "operator", "researcher", "professor"],
     "education.metrics.read": ["admin", "operator", "researcher", "professor"],
@@ -73,11 +101,11 @@ def _normalize_permissions(loaded: dict[str, Any]) -> dict[str, list[str]]:
     if not isinstance(permissions_source, dict):
         return DEFAULT_POLICY
 
-    normalized: dict[str, list[str]] = {}
+    normalized: dict[str, list[str]] = dict(DEFAULT_POLICY)
     for key, value in permissions_source.items():
         if isinstance(key, str) and isinstance(value, list):
             normalized[key] = [str(role) for role in value]
-    return normalized or DEFAULT_POLICY
+    return normalized
 
 
 def _policy_checksum(version: str, permissions: dict[str, list[str]]) -> str:
@@ -141,7 +169,13 @@ async def lifespan(_: FastAPI):
     if ENVIRONMENT == "production" and JWT_SECRETS[0] == "liceu-academia-secret":
         raise RuntimeError("JWT secret padrao nao permitido em producao")
 
-    await federation_runtime.connect()
+    if FEDERATION_OPTIONAL:
+        print("ACADEMIA federation startup skipped")
+    else:
+        try:
+            await federation_runtime.connect()
+        except Exception:
+            print("ACADEMIA federation startup unavailable: continuing in local-only mode")
     if not APP_INSTRUMENTED:
         FastAPIInstrumentor.instrument_app(app)
         APP_INSTRUMENTED = True
@@ -152,6 +186,26 @@ async def lifespan(_: FastAPI):
 app = FastAPI(
     title="ACADEMIA DO SABER - Collective Intelligence Learning Runtime",
     lifespan=lifespan,
+)
+
+app.include_router(
+    educational_autonomic_router
+)
+
+app.include_router(
+    educational_memory_mesh_router
+)
+
+app.include_router(
+    pedagogical_reasoning_router
+)
+
+app.include_router(
+    civilization_education_sync_router
+)
+
+app.include_router(
+    federated_learning_identity_router
 )
 
 JWT_SECRET = os.getenv("JWT_SECRET", "liceu-academia-secret")
@@ -246,6 +300,22 @@ class InterplanetaryResearchPayload(BaseModel):
     track: str
 
 
+class EarthKnowledgePayload(BaseModel):
+    student_id: str
+    researcher: str
+    discipline: str = "earth_systems"
+    certification: str = "earth_runtime_mastery"
+    cognition_score: float = 0.9
+    consistency: float = 0.86
+    engagement: float = 0.93
+    scientific_finding: str
+    model: str
+    lesson_learned: str
+    engineering_knowledge: str
+    economic_knowledge: str
+    climate_knowledge: str
+
+
 class TokenRequestPayload(BaseModel):
     subject: str
     role: str = "academy-runtime"
@@ -334,6 +404,9 @@ async def publish_event(subject_key: str, payload: dict[str, Any]) -> None:
         await federation_runtime.publish(subject, payload)
         EVENT_PUBLISH_COUNTER.labels(subject=subject, status="success").inc()
     except Exception:
+        if FEDERATION_OPTIONAL:
+            EVENT_PUBLISH_COUNTER.labels(subject=subject, status="skipped").inc()
+            return
         EVENT_PUBLISH_COUNTER.labels(subject=subject, status="failure").inc()
         raise
 
@@ -367,7 +440,11 @@ async def publish_authorization_audit(
         await federation_runtime.publish(subject, payload)
         EVENT_PUBLISH_COUNTER.labels(subject=subject, status="success").inc()
     except Exception:
+        if FEDERATION_OPTIONAL:
+            EVENT_PUBLISH_COUNTER.labels(subject=subject, status="skipped").inc()
+            return
         EVENT_PUBLISH_COUNTER.labels(subject=subject, status="failure").inc()
+
 
 
 @app.middleware("http")
@@ -400,6 +477,36 @@ async def metrics_middleware(request: Request, call_next):
 @app.get("/health")
 async def health():
     return {"status": "healthy", "runtime": "academia-do-saber"}
+
+
+@app.get("/academy/continental/summary", tags=["Continental Institutional Memory"])
+async def continental_summary(
+    _: dict[str, Any] = Depends(require_roles("education.runtime.read")),
+):
+    from runtime.education.educational_memory_mesh import EducationalMemoryMesh, ScientificKnowledgeGraph
+
+    runtime_status = {
+        "knowledge": continental_knowledge_run_runtime is not None,
+        "learning": continental_learning_run_runtime is not None,
+        "scientific_graph": continental_scientific_graph_run_runtime is not None,
+        "institutional_memory": institutional_memory_run_runtime is not None,
+    }
+
+    summary_payload = {
+        "runtime_identity": "Continental Institutional Memory",
+        "runtimes": list(runtime_status.keys()),
+        "runtime_status": runtime_status,
+        "institutional_memory_status": "ready" if all(runtime_status.values()) else "partial",
+        "summary": {
+            "knowledge_graph": "available" if runtime_status["knowledge"] else "unavailable",
+            "learning_flow": "available" if runtime_status["learning"] else "unavailable",
+            "scientific_graph": "available" if runtime_status["scientific_graph"] else "unavailable",
+            "institutional_memory": "available" if runtime_status["institutional_memory"] else "unavailable",
+        },
+        "memory_mesh": EducationalMemoryMesh.mesh_snapshot(limit=1),
+        "scientific_knowledge_graph": ScientificKnowledgeGraph.graph_snapshot(limit=1),
+    }
+    return summary_payload
 
 
 @app.get("/education/runtime-status")
@@ -597,6 +704,26 @@ async def interplanetary_curriculum(
     event_payload = {**payload.model_dump(), **curriculum}
     await publish_event("INTERPLANETARY_RESEARCH", event_payload)
     return event_payload
+
+
+@app.post("/earth/knowledge/persist")
+async def earth_knowledge_persist(
+    payload: EarthKnowledgePayload,
+    _: dict[str, Any] = Depends(require_roles("earth.knowledge.persist")),
+):
+    result = await earth_knowledge_run_runtime(payload.model_dump())
+    event_payload = {
+        "runtime": "earth_knowledge_runtime",
+        "student_id": payload.student_id,
+        "researcher": payload.researcher,
+        "discipline": payload.discipline,
+        "earth_runtime_state": result["earth_runtime_state"],
+        "knowledge_types": result["knowledge_registry"]["registered_types"],
+        "scientific_graph": result["integrations"]["scientific_graph"],
+        "memory_mesh": result["integrations"]["memory_mesh"],
+    }
+    await publish_event("KNOWLEDGE_UPLOADED", event_payload)
+    return result
 
 
 @app.post("/agents/john/mentor")
