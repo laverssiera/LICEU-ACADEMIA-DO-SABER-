@@ -151,8 +151,11 @@ def test_continental_scientific_graph_registers_institutional_memory_chain():
     assert memory["sequence"] == [
         "event", "cause", "decision", "execution", "impact", "mitigation", "result", "lesson_learned",
     ]
-    assert memory["nodes_registered"] == 8
-    assert memory["edges_created"] == 7
+    assert memory["chain_key"] == "eventcausedecisionexecutionimpactmitigationresultlesson_learned"
+    assert memory["graph_link"]["source_key"].endswith("::eventcausedecisionexecutionimpactmitigationresultlesson_learned")
+    assert memory["graph_link"]["target_key"].endswith("::shared practice preserves institutional knowledge")
+    assert memory["nodes_registered"] == 9
+    assert memory["edges_created"] == 8
 
 
 def test_continental_scientific_graph_runtime_uses_defaults_for_institutional_memory_chain():
@@ -170,8 +173,8 @@ def test_continental_scientific_graph_runtime_uses_defaults_for_institutional_me
     result = main.continental_scientific_graph_run_runtime(payload)
 
     assert result["continental_scientific_graph_runtime_state"] == "operational"
-    assert result["institutional_memory"]["nodes_registered"] == 8
-    assert result["institutional_memory"]["edges_created"] == 7
+    assert result["institutional_memory"]["nodes_registered"] == 9
+    assert result["institutional_memory"]["edges_created"] == 8
 
 
 def test_research_lineage_runtime_accepts_cli_flag():
