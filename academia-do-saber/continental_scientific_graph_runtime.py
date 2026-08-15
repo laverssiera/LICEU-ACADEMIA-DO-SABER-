@@ -153,6 +153,7 @@ def run_runtime(payload: dict[str, Any]) -> dict[str, Any]:
         ("mitigation", payload["mitigation"], "result", payload["result"], "produces_result"),
         ("result", payload["result"], "lesson_learned", payload["lesson_learned"], "generates_lesson_learned"),
     ]
+    memory_chain_key = "eventcausedecisionexecutionimpactmitigationresultlesson_learned"
 
     institutional_memory_nodes = {}
     for node_name, concept in [("event", payload["event"])] + [
@@ -199,6 +200,29 @@ def run_runtime(payload: dict[str, Any]) -> dict[str, Any]:
             "weight": link["relation"]["weight"],
         })
 
+    memory_chain_node = ScientificKnowledgeGraph.upsert_concept({
+        "discipline": f"{discipline}/institutional_memory",
+        "concept": memory_chain_key,
+        "confidence": confidence,
+        "source": source,
+        "tags": [continent, "institutional_memory", "memory_chain", "eventcausedecisionexecutionimpactmitigationresultlesson_learned"],
+    })
+    institutional_memory_nodes["chain_key"] = memory_chain_node["node"]["node_key"]
+
+    memory_chain_link = ScientificKnowledgeGraph.link_concepts({
+        "discipline": f"{discipline}/institutional_memory",
+        "source_concept": memory_chain_key,
+        "target_concept": payload["lesson_learned"],
+        "relation_type": "encodes_lesson_learned",
+        "weight": confidence,
+    })
+    institutional_memory_edges.append({
+        "source_key": memory_chain_link["relation"]["source_key"],
+        "target_key": memory_chain_link["relation"]["target_key"],
+        "relation_type": memory_chain_link["relation"]["relation_type"],
+        "weight": memory_chain_link["relation"]["weight"],
+    })
+
     snapshot = ScientificKnowledgeGraph.graph_snapshot(discipline=discipline)
 
     entry = {
@@ -213,8 +237,15 @@ def run_runtime(payload: dict[str, Any]) -> dict[str, Any]:
         },
         "edges": edges,
         "institutional_memory": {
+            "chain_key": memory_chain_key,
             "nodes": institutional_memory_nodes,
             "edges": institutional_memory_edges,
+            "graph_link": {
+                "source_key": memory_chain_link["relation"]["source_key"],
+                "target_key": memory_chain_link["relation"]["target_key"],
+                "relation_type": memory_chain_link["relation"]["relation_type"],
+                "weight": memory_chain_link["relation"]["weight"],
+            },
         },
         "graph_snapshot": {
             "node_count": snapshot["node_count"],
@@ -242,6 +273,13 @@ def run_runtime(payload: dict[str, Any]) -> dict[str, Any]:
         "institutional_memory": {
             "knowledge_registered": True,
             "sequence": ["event", "cause", "decision", "execution", "impact", "mitigation", "result", "lesson_learned"],
+            "chain_key": memory_chain_key,
+            "graph_link": {
+                "source_key": memory_chain_link["relation"]["source_key"],
+                "target_key": memory_chain_link["relation"]["target_key"],
+                "relation_type": memory_chain_link["relation"]["relation_type"],
+                "weight": memory_chain_link["relation"]["weight"],
+            },
             "nodes_registered": len(institutional_memory_nodes),
             "edges_created": len(institutional_memory_edges),
         },
