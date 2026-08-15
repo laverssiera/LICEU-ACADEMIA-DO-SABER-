@@ -157,6 +157,12 @@ def test_continental_scientific_graph_registers_institutional_memory_chain():
     assert memory["nodes_registered"] == 9
     assert memory["edges_created"] == 8
 
+    scientific_memory = payload["scientific_memory"]
+    assert scientific_memory["sequence"] == memory["sequence"]
+    assert scientific_memory["layers_captured"] == 8
+    assert [state["layer"] for state in scientific_memory["captured"]] == memory["sequence"]
+    assert scientific_memory["captured"][-1]["content"] == "shared practice preserves institutional knowledge"
+
 
 def test_continental_scientific_graph_runtime_uses_defaults_for_institutional_memory_chain():
     payload = {

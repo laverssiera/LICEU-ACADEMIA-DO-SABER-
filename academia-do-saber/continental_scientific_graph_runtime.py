@@ -74,6 +74,53 @@ def _persist_entry(payload: dict[str, Any]) -> dict[str, Any]:
     return {"ledger_path": str(LEDGER_PATH), "total_entries": len(ledger["entries"]) }
 
 
+def _build_institutional_memory_chain(payload: dict[str, Any]) -> list[tuple[str, Any, str, Any, str]]:
+    return [
+        ("event", payload["event"], "cause", payload["cause"], "causes"),
+        ("cause", payload["cause"], "decision", payload["decision"], "informs_decision"),
+        ("decision", payload["decision"], "execution", payload["execution"], "requires_execution"),
+        ("execution", payload["execution"], "impact", payload["impact"], "produces_impact"),
+        ("impact", payload["impact"], "mitigation", payload["mitigation"], "motivates_mitigation"),
+        ("mitigation", payload["mitigation"], "result", payload["result"], "produces_result"),
+        ("result", payload["result"], "lesson_learned", payload["lesson_learned"], "generates_lesson_learned"),
+    ]
+
+
+def _capture_scientific_memory(
+    payload: dict[str, Any],
+    chain: list[tuple[str, Any, str, Any, str]],
+) -> dict[str, Any]:
+    from runtime.education.educational_memory_mesh import EducationalMemoryMesh
+
+    stages = [("event", payload["event"])] + [
+        (target_name, target_concept) for _, _, target_name, target_concept, _ in chain
+    ]
+    captured = []
+    for stage, content in stages:
+        result = EducationalMemoryMesh.upsert_learning_state({
+            "student_id": f"institutional-memory::{payload['continent']}",
+            "discipline": f"{payload['discipline']}/scientific_memory",
+            "cognition_score": payload["confidence"],
+            "consistency": payload["confidence"],
+            "engagement": payload["confidence"],
+            "intervention": f"scientific_memory::{stage}::{content}",
+            "layer": stage,
+            "content": str(content),
+        })
+        captured.append({
+            "layer": stage,
+            "content": str(content),
+            "signature": result["learning_state"]["signature"],
+        })
+
+    return {
+        "runtime_state": "educational_memory_mesh_operational",
+        "sequence": [stage for stage, _ in stages],
+        "layers_captured": len(captured),
+        "captured": captured,
+    }
+
+
 def run_runtime(payload: dict[str, Any]) -> dict[str, Any]:
     project_root = Path(__file__).resolve().parent
     if str(project_root) not in sys.path:
@@ -144,16 +191,9 @@ def run_runtime(payload: dict[str, Any]) -> dict[str, Any]:
         (payload["relation"], payload["causality"], "produces_causality"),
     ]
 
-    institutional_memory_chain = [
-        ("event", payload["event"], "cause", payload["cause"], "causes"),
-        ("cause", payload["cause"], "decision", payload["decision"], "informs_decision"),
-        ("decision", payload["decision"], "execution", payload["execution"], "requires_execution"),
-        ("execution", payload["execution"], "impact", payload["impact"], "produces_impact"),
-        ("impact", payload["impact"], "mitigation", payload["mitigation"], "motivates_mitigation"),
-        ("mitigation", payload["mitigation"], "result", payload["result"], "produces_result"),
-        ("result", payload["result"], "lesson_learned", payload["lesson_learned"], "generates_lesson_learned"),
-    ]
+    institutional_memory_chain = _build_institutional_memory_chain(payload)
     memory_chain_key = "eventcausedecisionexecutionimpactmitigationresultlesson_learned"
+    scientific_memory = _capture_scientific_memory(payload, institutional_memory_chain)
 
     institutional_memory_nodes = {}
     for node_name, concept in [("event", payload["event"])] + [
@@ -247,6 +287,7 @@ def run_runtime(payload: dict[str, Any]) -> dict[str, Any]:
                 "weight": memory_chain_link["relation"]["weight"],
             },
         },
+        "scientific_memory": scientific_memory,
         "graph_snapshot": {
             "node_count": snapshot["node_count"],
             "edge_count": snapshot["relation_count"],
@@ -283,6 +324,7 @@ def run_runtime(payload: dict[str, Any]) -> dict[str, Any]:
             "nodes_registered": len(institutional_memory_nodes),
             "edges_created": len(institutional_memory_edges),
         },
+        "scientific_memory": scientific_memory,
         "ledger": ledger_result,
     }
 

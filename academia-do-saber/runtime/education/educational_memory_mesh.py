@@ -51,6 +51,10 @@ class EducationalMemoryMesh:
             "intervention": intervention,
         }
 
+        for metadata_key in ("layer", "content"):
+            if metadata_key in payload:
+                learning_state[metadata_key] = payload[metadata_key]
+
         state_signature = hashlib.sha256(
             str(learning_state).encode()
         ).hexdigest()
