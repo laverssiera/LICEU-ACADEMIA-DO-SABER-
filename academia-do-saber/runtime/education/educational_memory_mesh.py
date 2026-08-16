@@ -8,11 +8,64 @@ from typing import Any
 router = APIRouter()
 
 MEMORY_MESH = []
+INSTITUTIONAL_MEMORY = []
 SCIENTIFIC_KNOWLEDGE_NODES: dict[str, dict[str, Any]] = {}
 SCIENTIFIC_KNOWLEDGE_EDGES: list[dict[str, Any]] = []
 
 
 class EducationalMemoryMesh:
+
+    @staticmethod
+    def record_decision_learning(payload: dict[str, Any]) -> dict[str, Any]:
+        required_fields = (
+            "event",
+            "cause",
+            "decision",
+            "execution",
+            "impact",
+            "mitigation",
+            "result",
+            "lesson_learned",
+            "future_decision",
+        )
+        missing_fields = [field for field in required_fields if not str(payload.get(field, "")).strip()]
+        if missing_fields:
+            raise ValueError(f"missing institutional memory fields: {', '.join(missing_fields)}")
+
+        record = {
+            "memory_id": hashlib.sha256(
+                f"{payload['event']}:{payload['decision']}:{payload['lesson_learned']}".encode()
+            ).hexdigest(),
+            "timestamp": time.time(),
+            "continent": payload.get("continent"),
+            "discipline": payload.get("discipline"),
+            "chain_key": "eventcausedecisionexecutionimpactmitigationresultlesson_learned",
+            "event": str(payload["event"]),
+            "cause": str(payload["cause"]),
+            "decision": str(payload["decision"]),
+            "execution": str(payload["execution"]),
+            "impact": str(payload["impact"]),
+            "mitigation": str(payload["mitigation"]),
+            "result": str(payload["result"]),
+            "lesson_learned": str(payload["lesson_learned"]),
+            "future_decision": str(payload["future_decision"]),
+            "usable_for_future_decision": True,
+            "confidence": float(payload.get("confidence", 0.0)),
+        }
+        INSTITUTIONAL_MEMORY.append(record)
+        return {
+            "record": record,
+            "memory_size": len(INSTITUTIONAL_MEMORY),
+            "runtime_state": "institutional_memory_learning_operational",
+        }
+
+    @staticmethod
+    def decision_learning(discipline: str | None = None, limit: int = 20) -> list[dict[str, Any]]:
+        limit = max(1, min(limit, 1000))
+        records = INSTITUTIONAL_MEMORY
+        if discipline:
+            records = [record for record in records if record.get("discipline") == discipline]
+        return records[-limit:]
 
     @staticmethod
     def upsert_learning_state(payload: dict) -> dict:
@@ -358,6 +411,14 @@ async def memory_mesh_snapshot(limit: int = 20):
     return {
         "snapshot": EducationalMemoryMesh.mesh_snapshot(limit),
         "runtime_identity": "Educational Memory Mesh",
+    }
+
+
+@router.get("/education/institutional-memory/decision-learning")
+async def institutional_memory_decision_learning(discipline: str | None = None, limit: int = 20):
+    return {
+        "records": EducationalMemoryMesh.decision_learning(discipline, limit),
+        "runtime_identity": "Institutional Memory",
     }
 
 

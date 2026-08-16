@@ -51,6 +51,7 @@ def _parse_args() -> argparse.Namespace:
     parser.add_argument("--mitigation", default=os.getenv("CONTINENT_MEMORY_MITIGATION", "close knowledge gaps through shared institutional practice"))
     parser.add_argument("--result", default=os.getenv("CONTINENT_MEMORY_RESULT", "the intervention stabilizes adaptive institutional resilience"))
     parser.add_argument("--lesson-learned", default=os.getenv("CONTINENT_MEMORY_LESSON_LEARNED", "traceable decisions turn experience into reusable institutional knowledge"))
+    parser.add_argument("--future-decision", default=os.getenv("CONTINENT_MEMORY_FUTURE_DECISION", "reuse the lesson in the next evidence-informed governance decision"))
     return parser.parse_args()
 
 
@@ -144,8 +145,9 @@ def run_runtime(payload: dict[str, Any]) -> dict[str, Any]:
     payload.setdefault("mitigation", os.getenv("CONTINENT_MEMORY_MITIGATION", "close knowledge gaps through shared institutional practice"))
     payload.setdefault("result", os.getenv("CONTINENT_MEMORY_RESULT", "the intervention stabilizes adaptive institutional resilience"))
     payload.setdefault("lesson_learned", os.getenv("CONTINENT_MEMORY_LESSON_LEARNED", "traceable decisions turn experience into reusable institutional knowledge"))
+    payload.setdefault("future_decision", os.getenv("CONTINENT_MEMORY_FUTURE_DECISION", "reuse the lesson in the next evidence-informed governance decision"))
 
-    from runtime.education.educational_memory_mesh import ScientificKnowledgeGraph
+    from runtime.education.educational_memory_mesh import EducationalMemoryMesh, ScientificKnowledgeGraph
 
     now = time.time()
     continent = str(payload["continent"])
@@ -194,6 +196,7 @@ def run_runtime(payload: dict[str, Any]) -> dict[str, Any]:
     institutional_memory_chain = _build_institutional_memory_chain(payload)
     memory_chain_key = "eventcausedecisionexecutionimpactmitigationresultlesson_learned"
     scientific_memory = _capture_scientific_memory(payload, institutional_memory_chain)
+    decision_learning = EducationalMemoryMesh.record_decision_learning(payload)
 
     institutional_memory_nodes = {}
     for node_name, concept in [("event", payload["event"])] + [
@@ -288,6 +291,7 @@ def run_runtime(payload: dict[str, Any]) -> dict[str, Any]:
             },
         },
         "scientific_memory": scientific_memory,
+        "decision_learning": decision_learning,
         "graph_snapshot": {
             "node_count": snapshot["node_count"],
             "edge_count": snapshot["relation_count"],
@@ -325,6 +329,7 @@ def run_runtime(payload: dict[str, Any]) -> dict[str, Any]:
             "edges_created": len(institutional_memory_edges),
         },
         "scientific_memory": scientific_memory,
+        "decision_learning": decision_learning,
         "ledger": ledger_result,
     }
 
@@ -347,6 +352,7 @@ def main() -> None:
         "mitigation": args.mitigation,
         "result": args.result,
         "lesson_learned": args.lesson_learned,
+        "future_decision": args.future_decision,
     }
     result = run_runtime(payload)
     print(json.dumps(result, ensure_ascii=True, indent=2, sort_keys=True))

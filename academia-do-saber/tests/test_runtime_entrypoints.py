@@ -163,6 +163,12 @@ def test_continental_scientific_graph_registers_institutional_memory_chain():
     assert [state["layer"] for state in scientific_memory["captured"]] == memory["sequence"]
     assert scientific_memory["captured"][-1]["content"] == "shared practice preserves institutional knowledge"
 
+    decision_learning = payload["decision_learning"]["record"]
+    assert decision_learning["chain_key"] == memory["chain_key"]
+    assert decision_learning["lesson_learned"] == "shared practice preserves institutional knowledge"
+    assert decision_learning["usable_for_future_decision"] is True
+    assert decision_learning["future_decision"]
+
 
 def test_continental_scientific_graph_runtime_uses_defaults_for_institutional_memory_chain():
     payload = {
