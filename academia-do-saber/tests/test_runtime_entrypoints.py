@@ -402,3 +402,73 @@ def test_local_http_flow_works_with_optional_federation(monkeypatch):
 
     assert interplanetary_response.status_code == 200
     assert interplanetary_response.json()["mars_engineering"] is True
+
+
+def test_wave_86_replays_planetary_institutional_memory_without_duplication():
+    from planetary_institutional_memory_runtime import run_runtime
+    from runtime.education.educational_memory_mesh import (
+        INSTITUTIONAL_MEMORY,
+        MEMORY_MESH,
+        SCIENTIFIC_KNOWLEDGE_EDGES,
+        SCIENTIFIC_KNOWLEDGE_NODES,
+    )
+
+    payload = {
+        "source_event_id": "w85-event-001",
+        "trace_id": "w85-trace-001",
+        "decision_id": "w82-decision-001",
+        "governance_decision_id": "w82-governance-001",
+        "execution_id": "w83-execution-001",
+        "infrastructure_change_id": "w79-infrastructure-001",
+        "supplier_analysis_id": "w80-supplier-001",
+        "procurement_plan_id": "w80-procurement-001",
+        "economic_impact_id": "w81-economic-001",
+        "financial_exposure_id": "w81-financial-001",
+        "legal_assessment_id": "w82-legal-001",
+        "planetary_operational_state_id": "w85-state-001",
+        "initial_hypothesis": "causal memory reduces operational variance",
+        "observed_evidence": "the replay preserved every source reference",
+        "decision_taken": "reuse the validated institutional protocol",
+        "decision_consequence": "the planetary handoff remained consistent",
+        "economic_impacts": "regional productivity loss was avoided",
+        "financial_impacts": "financial exposure remained bounded",
+        "legal_impacts": "the governance record stayed auditable",
+        "infrastructure_impacts": "critical service uptime was preserved",
+        "supply_chain_impacts": "supplier fallback remained available",
+        "identified_risks": "duplicate knowledge registration",
+        "mitigators_used": "deterministic identity and replay lookup",
+        "final_result": "institutional memory was reconstructed successfully",
+        "failures_avoided": "duplicate learning and disconnected lineage",
+        "identified_patterns": "state-linked causal chains are reusable",
+        "reusable_knowledge": "replay the protocol for future planetary decisions",
+        "event": "W79-W85 event envelope",
+        "cause": "observed operational variance required analysis",
+        "context": "planetary operational state was under governance",
+        "decision": "adopt the evidence-informed protocol",
+        "execution": "coordinate the protocol across the academy",
+        "impact": "continuity improved across institutional handoffs",
+        "risk": "uncoordinated replay could duplicate knowledge",
+        "mitigation": "use the existing graph and memory registries",
+        "result": "the chain became reusable institutional knowledge",
+        "lesson_learned": "causal evidence makes planetary memory reusable",
+    }
+
+    before = (len(INSTITUTIONAL_MEMORY), len(MEMORY_MESH), len(SCIENTIFIC_KNOWLEDGE_NODES), len(SCIENTIFIC_KNOWLEDGE_EDGES))
+    first = run_runtime(payload)
+    after_first = (len(INSTITUTIONAL_MEMORY), len(MEMORY_MESH), len(SCIENTIFIC_KNOWLEDGE_NODES), len(SCIENTIFIC_KNOWLEDGE_EDGES))
+    second = run_runtime(payload)
+    after_second = (len(INSTITUTIONAL_MEMORY), len(MEMORY_MESH), len(SCIENTIFIC_KNOWLEDGE_NODES), len(SCIENTIFIC_KNOWLEDGE_EDGES))
+
+    assert first == second
+    assert first["wave"] == 86
+    assert first["knowledge_record_id"]
+    assert first["lesson_learned_id"]
+    assert all(first[field] is True for field in (
+        "contract_valid", "lineage_valid", "knowledge_graph_valid",
+        "scientific_memory_valid", "institutional_memory_valid",
+        "causal_context_valid", "lesson_learned_valid", "knowledge_reuse_valid",
+        "replay_valid", "idempotency_valid", "rollback_valid", "recovery_valid", "audit_valid",
+    ))
+    assert first["status"] == "PASS"
+    assert after_first[0] == before[0] + 1
+    assert after_second == after_first
