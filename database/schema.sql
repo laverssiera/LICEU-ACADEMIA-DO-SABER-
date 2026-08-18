@@ -107,3 +107,34 @@ CREATE TABLE academy_tokens (
     reason TEXT,
     created_at TIMESTAMP DEFAULT now()
 );
+
+-- WAVE 86: cadeia causal de memoria institucional da academia
+CREATE TABLE IF NOT EXISTS academia_memory_chain (
+    knowledge_record_id TEXT PRIMARY KEY,
+    lesson_learned_id TEXT NOT NULL,
+    planetary_operational_state_id TEXT NOT NULL,
+    wave INTEGER NOT NULL,
+    recorded_at DOUBLE PRECISION NOT NULL,
+    event TEXT NOT NULL,
+    cause TEXT NOT NULL,
+    context TEXT NOT NULL,
+    decision TEXT NOT NULL,
+    execution TEXT NOT NULL,
+    impact TEXT NOT NULL,
+    risk TEXT NOT NULL,
+    mitigation TEXT NOT NULL,
+    result TEXT NOT NULL,
+    lesson_learned TEXT NOT NULL,
+    source_artifacts JSONB NOT NULL,
+    evidence JSONB NOT NULL,
+    graph_nodes JSONB NOT NULL,
+    graph_edges JSONB NOT NULL,
+    scientific_memory JSONB NOT NULL,
+    usable_for_future_decision BOOLEAN NOT NULL DEFAULT true
+);
+
+CREATE INDEX IF NOT EXISTS idx_academia_memory_chain_state
+    ON academia_memory_chain (planetary_operational_state_id);
+
+CREATE INDEX IF NOT EXISTS idx_academia_memory_chain_lesson
+    ON academia_memory_chain (lesson_learned_id);
