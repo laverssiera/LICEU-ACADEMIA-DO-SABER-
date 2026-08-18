@@ -404,8 +404,9 @@ def test_local_http_flow_works_with_optional_federation(monkeypatch):
     assert interplanetary_response.json()["mars_engineering"] is True
 
 
-def test_wave_86_replays_planetary_institutional_memory_without_duplication():
-    from planetary_institutional_memory_runtime import run_runtime
+def test_wave_86_replays_planetary_institutional_memory_without_duplication(tmp_path, monkeypatch):
+    monkeypatch.setenv("ACADEMIA_MEMORY_DB_PATH", str(tmp_path / "academia_memory.db"))
+    from planetary_institutional_memory_runtime import read_runtime, run_runtime
     from runtime.education.educational_memory_mesh import (
         INSTITUTIONAL_MEMORY,
         MEMORY_MESH,
@@ -467,8 +468,26 @@ def test_wave_86_replays_planetary_institutional_memory_without_duplication():
         "contract_valid", "lineage_valid", "knowledge_graph_valid",
         "scientific_memory_valid", "institutional_memory_valid",
         "causal_context_valid", "lesson_learned_valid", "knowledge_reuse_valid",
-        "replay_valid", "idempotency_valid", "rollback_valid", "recovery_valid", "audit_valid",
+        "persistence_valid", "replay_valid", "idempotency_valid", "rollback_valid",
+        "recovery_valid", "audit_valid",
     ))
     assert first["status"] == "PASS"
+    assert first["memory_chain_table"] == "academia_memory_chain"
     assert after_first[0] == before[0] + 1
     assert after_second == after_first
+
+    INSTITUTIONAL_MEMORY.clear()
+    reopened = read_runtime(first["knowledge_record_id"])
+    assert reopened["status"] == "PASS"
+    assert reopened["found"] is True
+    assert reopened["record"]["lesson_learned_id"] == first["lesson_learned_id"]
+    assert reopened["record"]["chain"]["lesson_learned"] == payload["lesson_learned"]
+    assert reopened["record"]["source_artifacts"]["planetary_operational_state_id"] == payload["planetary_operational_state_id"]
+
+    restarted = _run_script(
+        "planetary_institutional_memory_runtime.py",
+        "--read",
+        first["knowledge_record_id"],
+    )
+    assert restarted["status"] == "PASS"
+    assert restarted["record"]["knowledge_record_id"] == first["knowledge_record_id"]
